@@ -36,13 +36,28 @@ def do():
     padre = root.findall(u'./way/tag[@v="Rua Padre António Vieira"]/..')
     sampaio = root.findall(u'./way/tag[@v="Rua Sampaio e Pina"]/..')
 
+    for way in artilharias:
+        #print way.attrib
+        nodes = way.findall(u'./nd[@ref]')
+        for node in nodes:
+            #print 'artilharia: ' + node.get('ref')
+            for pway in padre:
+                pnodes = pway.findall(u'./nd[@ref]')
+                for pnode in pnodes:
+                    #print 'padre: ' + pnode.get('ref') 
+                    if node.get('ref') == pnode.get('ref'):
+                        print 'MATCH in ' + pnode.get('ref')
+                        print way.attrib
+                        print pway.attrib
+
+
 if __name__ == "__main__":
     read_file()    
     do()
 
-tree = ET.parse('map.osm')
-root = tree.getroot()
+# tree = ET.parse('map.osm')
+# root = tree.getroot()
 
-artilharias = root.findall(u'./way/tag[@v="Rua da Artilharia 1"]/..')
-padre = root.findall(u'./way/tag[@v="Rua Padre António Vieira"]/..')
-sampaio = root.findall(u'./way/tag[@v="Rua Sampaio e Pina"]/..')
+# artilharias = root.findall(u'./way/tag[@v="Rua da Artilharia 1"]/..')
+# padre = root.findall(u'./way/tag[@v="Rua Padre António Vieira"]/..')
+# sampaio = root.findall(u'./way/tag[@v="Rua Sampaio e Pina"]/..')
