@@ -1,3 +1,8 @@
+import random
+
+# http://osof.org/wp-content/uploads/2016/03/OSOF-Waste-Conversion-Table.pdf
+plastic_kg_per_cubic_meter = 130
+
 class chromosome:
     def __init__(self):
         self.path = []
@@ -32,3 +37,15 @@ class route:
             print 'must load the total weight of garbage collected and store it at the garbage_weight variable'
             self.garbage_weigth = 0
         return self.garbage_weigth
+
+
+def generate_initial_pop(edges, capacities):
+    print 'must generate a random population given the edges, and the trucks cappacities, starting with 20 chromosomes'
+    chromosomes = []
+    for _ in range(20):
+        cr = chromosome()
+        cr.path = list(edges) # copy the list
+        random.shuffle(cr.path)        
+        chromosomes.append(cr)
+        
+    return chromosomes

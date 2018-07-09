@@ -8,6 +8,7 @@ import osmnx as ox
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
+import chromosome as cr
 
 
 def read_file():
@@ -86,12 +87,22 @@ def do():
 # count the cars by capacity (n importa a placa do carro, e sim a capacidade DISTINCT)
 # ----------------------------------------------------------------------------------
 
-# Getting city data from Open Street Maps
-G = ox.graph_from_place('Campolide, Lisboa', network_type='drive')
-print 'got osm data downloaded for campolide with OSMnx'
+try:
+    G = ox.load_graphml('network.graphml')
+    print 'opened the network graph from file'
+except:
+    print 'could not open the network graph from file, try to download it' 
+    # Getting city data from Open Street Maps
+    G = ox.graph_from_place('Campolide, Lisboa', network_type='drive')
+    print 'got osm data downloaded for campolide with OSMnx'
 
-print 'We have (' + str(G.number_of_nodes()) + \
-    ') nodes and (' + str(G.number_of_edges()) + ') edges'
+    # save street network as GraphML file
+    print 'saving the network graph in the disk'
+    G_projected = ox.project_graph(G)
+    ox.save_graphml(G_projected, filename='network.graphml')
+    print 'done saving in the disk'
+
+print 'We have (' + str(G.number_of_nodes()) + ') nodes and (' + str(G.number_of_edges()) + ') edges'
 
 # Full city data plot
 # ox.plot_graph(G)
@@ -126,13 +137,15 @@ for edge in G.edges:
 # nx.draw(G, with_labels=False, font_weight='normal', node_size=10)
 # plt.show()
 
-node_1 = 416835588
-node_2 = 416835591
-route = nx.shortest_path(G, node_1, node_2, weight='length')
-length = nx.shortest_path_length(G, node_1, node_2, weight='length')
-garbage_collected = nx.shortest_path_length(
-    G, node_1, node_2, weight='garbage_weight')
-print 'route: '
-print route
-print 'length: ' + str(length)
-print 'garbage collected: ' + str(garbage_collected)
+# node_1 = 416835588
+# node_2 = 416835591
+# route = nx.shortest_path(G, node_1, node_2, weight='length')
+# length = nx.shortest_path_length(G, node_1, node_2, weight='length')
+# garbage_collected = nx.shortest_path_length(
+#     G, node_1, node_2, weight='garbage_weight')
+# print 'route: '
+# print route
+# print 'length: ' + str(length)
+# print 'garbage collected: ' + str(garbage_collected)
+
+chromo = cr.generate_initial_pop(G.edges, [cr.plastic_kg_per_cubic_meter])
