@@ -36,8 +36,10 @@ class Population:
         new_population.chromosomes.append(best_fit)
 
         # for the number of the population size - 1, do:
-        for i in len(self.chromosomes[1:]):
+        remaining_size = len(self.chromosomes[1:])
+        for i in range(1, remaining_size + 1):
             print 'generating child ' + str(i)
+            new_population.chromosomes.append(self.chromosomes[i])
             # must select parent 1 using TOURNAMENT SELECTION
             # must select parent 2 using TOURNAMENT SELECTION
             # crossover these chomosomes
