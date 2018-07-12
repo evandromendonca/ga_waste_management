@@ -8,7 +8,8 @@ import osmnx as ox
 import networkx as nx
 import matplotlib.pyplot as plt
 import random
-from chromosome import chromosome
+import ga
+from population import Population
 
 
 def read_file():
@@ -91,7 +92,7 @@ try:
     G = ox.load_graphml('network.graphml')
     print 'opened the network graph from file'
 except:
-    print 'could not open the network graph from file, try to download it' 
+    print 'could not open the network graph from file, try to download it'
     # Getting city data from Open Street Maps
     G = ox.graph_from_place('Campolide, Lisboa', network_type='drive')
     print 'got osm data downloaded for campolide with OSMnx'
@@ -102,7 +103,8 @@ except:
     ox.save_graphml(G_projected, filename='network.graphml')
     print 'done saving in the disk'
 
-print 'We have (' + str(G.number_of_nodes()) + ') nodes and (' + str(G.number_of_edges()) + ') edges'
+print 'We have (' + str(G.number_of_nodes()) + \
+    ') nodes and (' + str(G.number_of_edges()) + ') edges'
 
 # Full city data plot
 # ox.plot_graph(G)
@@ -131,6 +133,28 @@ print 'We have (' + str(G.number_of_nodes()) + \
 for edge in G.edges:
     G.edges[edge]['garbage_weight'] = random.randint(1, 100)
 
+# available trucks must also be presented
+trucks = [
+    ('95-60-LG', 900),
+    ('05-IG-14', 1400),
+    ('53-MP-23', 500),
+    ('54-SV-71', 600),
+    ('79-20-XT', 400)
+]
+
+# randomize the initial population
+population = Population(G.edges, trucks, True)
+print 'initial population best fitness:'
+population.best_fitness()
+
+for i in range(40):
+    population = population.evolve()
+    print 'iteration ' + str(i) + ' best fitness:'
+    population.best_fitness()
+
+print 'final population best fitness:'
+population.best_fitness()
+
 # # plot the graph
 # print 'plooting'
 # plt.subplot(111)
@@ -147,72 +171,3 @@ for edge in G.edges:
 # print route
 # print 'length: ' + str(length)
 # print 'garbage collected: ' + str(garbage_collected)
-
-trucks = [
-    ('95-60-LG', 900),
-    ('05-IG-14', 1400),
-    ('53-MP-23', 500),
-    ('54-SV-71', 600),
-    ('79-20-XT', 400)
-]
-
-def generate_initial_pop(edges, trucks):
-    print 'generate a random population with 20 members given the edges and the trucks'
-    chromosomes = []
-
-    # generate 2 random routes combinations
-    for _ in range(2):
-        # create a chromosome
-        cr = chromosome()        
-
-        # copy and shuffle all the edges
-        cr.path = list(edges) # copy the list
-        random.shuffle(cr.path)
-
-        # to keep the trucks that were already chosen by the algorithm
-        already_chosen_trucks = []
-
-        total_edges = len(cr.path)
-        served_edges = 0
-        # do this while there are unvisited edges
-        while  served_edges < total_edges:
-
-            # give the opportunity for the unchosed truck
-            # with this I want ot maximaze the utilization of all trucks 
-            # if every truck had the chance, let it be FFA
-            if len(already_chosen_trucks) == len(trucks):
-                to_chose_trucks = trucks
-            else:
-                to_chose_trucks = [truck for truck in trucks if truck not in already_chosen_trucks]                
-
-            # select a random truck
-            t = random.choice(to_chose_trucks)
-            t_start = served_edges # inclusive  [t_start, t_end)
-            t_end = served_edges # exclusive
-            t_fill = 0
-            t_capacity = t[1]
-
-            # just update the already chosen trucks if it matters
-            if len(already_chosen_trucks) < len(trucks):
-                already_chosen_trucks.append(t)
-            
-            # start filling the truck with the sequence of edges
-            for edge in cr.path[served_edges:]:
-                if t_fill + G.edges[edge]['garbage_weight'] <= t_capacity:
-                    t_fill += G.edges[edge]['garbage_weight']
-                    t_end += 1
-                    served_edges += 1
-                else:
-                    # the truck is full loaded, stop the loop and chose other truck to complete the job
-                    break
-            
-            # here we must check if the truck will join the list of route trucks
-            # if the truck drived at least one edge, add it to the list
-            if t_end - t_start > 0:
-                cr.trucks_used.append((t, t_start, t_end, t_fill))        
-
-        chromosomes.append(cr)
-        
-    return chromosomes
-
-chromos = generate_initial_pop(G.edges, trucks)
