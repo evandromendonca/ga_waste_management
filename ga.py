@@ -4,7 +4,51 @@ from chromosome import Chromosome
 
 def crossover(parent_1, parent_2):
     print 'crossover must take place here'
+    
+    # select a truck from the parent 2
+    truck_route =  random.choice(parent_2.trucks_used)
+    truck_ini = truck_route[1]
+    truck_end = truck_route[2]
 
+    # select a subroute from the chosen truck_route
+    subroute_ini = random.randint(truck_ini, truck_end - 1)
+    subroute_end = random.randint(subroute_ini, truck_end - 1)
+
+    subroute = parent_2.path[subroute_ini, subroute_end]
+    closest_before_subroute = 0 #get_closest_betore_edge(subroute[0])
+
+    # now create a child inserting the subroute created in the parent_1
+    child = Chromosome()
+
+    create_new_route = False
+    last_end = 0
+    for truck_used in parent_1.trucks_used:
+        # get the edges_t of the route from trouck_used
+        truck_edges = parent_1.path[truck_used[1]: truck_used[2]] 
+        removed_edges = 0
+        added_edges = 0
+
+        for edge in truck_edges:
+            if edge not in subroute:
+                child.path.append(edge)
+
+                if edge == closest_before_subroute: 
+                    # MUST CHECK THE CAPACITY HERE?
+                    child.path.append(subroute)
+                    added_edges += len(subroute)
+            else:
+                removed_edges += 1
+
+        new_start = last_end
+        new_end = truck_used[2] - removed_edges + added_edges
+        last_end = new_end
+
+        if new_end - new_start > 0: # MUST CHECK THE CAPACITY HERE?
+            child.trucks_used.append((truck_used, new_start, new_end))
+        
+        # remove the edges in edges_t that match with the edges of the subroute
+        # if the 
+    
 
 def mutation(chromosome):
     print 'mutation must take place here'
