@@ -15,39 +15,48 @@ def crossover(parent_1, parent_2):
     subroute_end = random.randint(subroute_ini, truck_end - 1)
 
     subroute = parent_2.path[subroute_ini, subroute_end]
+    subroute_weight = 0 # MUST GET THE SUBROUTE WEIGHT
     closest_before_subroute = 0 #get_closest_betore_edge(subroute[0])
 
     # now create a child inserting the subroute created in the parent_1
     child = Chromosome()
 
-    create_new_route = False
+    to_new_truck = []
     last_end = 0
     for truck_used in parent_1.trucks_used:
         # get the edges_t of the route from trouck_used
-        truck_edges = parent_1.path[truck_used[1]: truck_used[2]] 
-        removed_edges = 0
-        added_edges = 0
+        truck_edges = parent_1.path[truck_used[1]:truck_used[2]] 
+
+        truck_capacity = truck_used[0][1]
+        truck_used_capacity = 0
+        new_start = last_end
+        new_end = last_end
 
         for edge in truck_edges:
-            if edge not in subroute:
-                child.path.append(edge)
+            if edge not in subroute: 
+                # check the capacity here
+                if truck_capacity >= truck_used_capacity + edge['garbage_weight']:
+                    new_end += 1
+                    truck_used_capacity += edge['garbage_weight']
+                    child.path.append(edge)
+                else:
+                    to_new_truck.append(edge)
 
                 if edge == closest_before_subroute: 
                     # MUST CHECK THE CAPACITY HERE?
-                    child.path.append(subroute)
-                    added_edges += len(subroute)
-            else:
-                removed_edges += 1
-
-        new_start = last_end
-        new_end = truck_used[2] - removed_edges + added_edges
-        last_end = new_end
+                    if truck_capacity >= truck_used_capacity + subroute_weight:
+                        new_end += len(subroute)
+                        truck_used_capacity += subroute_weight 
+                        child.path.append(subroute)                        
+                    else:
+                        to_new_truck.append(subroute)
 
         if new_end - new_start > 0: # MUST CHECK THE CAPACITY HERE?
             child.trucks_used.append((truck_used, new_start, new_end))
+
+        last_end = new_end
         
-        # remove the edges in edges_t that match with the edges of the subroute
-        # if the 
+    return child
     
 
 def mutation(chromosome):
