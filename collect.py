@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import random
 import ga
 from population import Population
+from helper import Helper
 
 
 def read_file():
@@ -86,21 +87,33 @@ def do():
 # Case of Campolide
 # Using the new Genetic Representation for the Vehicle Route Problem
 # count the cars by capacity (n importa a placa do carro, e sim a capacidade DISTINCT)
+#
+# Osmnx docs: http://osmnx.readthedocs.io/en/stable/osmnx.html
+# Xml.etree.ElementTree docs: https://docs.python.org/2/library/xml.etree.elementtree.html#elementtree-xpath
+# Shortest path: https://networkx.github.io/documentation/stable/reference/algorithms/shortest_paths.html?highlight=shortest%20path#module-networkx.algorithms.shortest_paths.astar
+# Routing: https://medium.com/@bobhaffner/osmnx-intro-and-routing-1fd744ba23d8
+# https://www.uv.es/belengue/carp.html
+# OpenStreetMaps: https://www.openstreetmap.org/relation/5400890#map=12/38.7441/-9.1581
 # ----------------------------------------------------------------------------------
 
 try:
-    G = ox.load_graphml('network.graphml')
-    print 'opened the network graph from file'
+    G = ox.load_graphml('campolide_graph.graphml')
+    G_lisbon = ox.load_graphml('lisbon_graph.graphml')
+    print 'opened the campolide_graph and lisbon_graph from file'
 except:
-    print 'could not open the network graph from file, try to download it'
+    print 'could not open the campolide_graph or lisbon_graph from file, try to download it'
     # Getting city data from Open Street Maps
     G = ox.graph_from_place('Campolide, Lisboa', network_type='drive')
-    print 'got osm data downloaded for campolide with OSMnx'
+    G_lisbon = ox.graph_from_place('Lisbon, Portugal', network_type='drive', which_result=2)
+    
+    print 'got osm data downloaded for Campolide and Lisbon with OSMnx'
 
     # save street network as GraphML file
-    print 'saving the network graph in the disk'
+    print 'saving the network and graph in the disk'
     G_projected = ox.project_graph(G)
-    ox.save_graphml(G_projected, filename='network.graphml')
+    G_projected_lisbon = ox.project_graph(G_lisbon)
+    ox.save_graphml(G_projected, filename='campolide_graph.graphml')
+    ox.save_graphml(G_projected_lisbon, filename='lisbon_graph.graphml')
     print 'done saving in the disk'
 
 print 'We have (' + str(G.number_of_nodes()) + \
@@ -131,7 +144,8 @@ print 'We have (' + str(G.number_of_nodes()) + \
 
 # Must attribute a weight of garbage to each edge
 for edge in G.edges:
-    G.edges[edge]['garbage_weight'] = random.randint(1, 100)
+    G.edges[edge]['weight'] = random.randint(1, 100)
+    #G_lisbon.edges[edge]['weight'] = random.randint(1, 100)
 
 # available trucks must also be presented
 trucks = [
@@ -142,8 +156,15 @@ trucks = [
     ('79-20-XT', 400)
 ]
 
+# create a helper
+helper = Helper(G_lisbon)
+
+# calculate each campolide edge distance
+#distance_map = helper.build_distance_map(G.edges)
+distance_map = helper.build_distance_map_from_files('edges.csv', 'distances.csv')
+
 # randomize the initial population
-population = Population(G.edges, trucks, True)
+population = Population(helper, G.edges, trucks, True)
 print 'initial population best fitness:'
 population.best_fitness()
 

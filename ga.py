@@ -14,7 +14,7 @@ def crossover(parent_1, parent_2):
     subroute_ini = random.randint(truck_ini, truck_end - 1)
     subroute_end = random.randint(subroute_ini, truck_end - 1)
 
-    subroute = parent_2.path[subroute_ini, subroute_end]
+    subroute = parent_2.path[subroute_ini:subroute_end]
     subroute_weight = 0 # MUST GET THE SUBROUTE WEIGHT
     closest_before_subroute = 0 #get_closest_betore_edge(subroute[0])
 
@@ -63,11 +63,45 @@ def mutation(chromosome):
     print 'mutation must take place here'
 
 
+def tournament_selection(chromosomes, helper):
+    if len(chromosomes) <= 0:
+        print 'No chromosome in this population yet'
+        return None
+
+    print 'choosing an indivial in the population based on a tournament'
+    selected_chromosomes = random.sample(chromosomes, 5)
+
+    if len(selected_chromosomes) <= 0:
+        print 'No chromosome selected for the sample at the tournament'
+        return None
+    
+    best_fit_chromosome = selected_chromosomes[0]
+    for chromosome in selected_chromosomes[1:]:
+        if chromosome.get_fitness(helper) < best_fit_chromosome.get_fitness(helper):
+            best_fit_chromosome = chromosome
+
+    print 'best fitness of tournament: ' + str(best_fit_chromosome.get_fitness(helper))
+    return best_fit_chromosome
+
+
+def get_best_fitness(chromosomes, helper):
+    if len(chromosomes) <= 0:
+        print 'No chromosome in this population yet'
+        return None
+
+    best_fit_chromosome = chromosomes[0]
+    for chromosome in chromosomes[1:]:
+        if chromosome.get_fitness(helper) < best_fit_chromosome.get_fitness(helper):
+            best_fit_chromosome = chromosome
+
+    print 'best fitness of: ' + str(best_fit_chromosome.get_fitness(helper))
+    return best_fit_chromosome
+
 def randomize_population(edges, trucks):
     chromosomes = []
 
     # generate random routes combinations
-    for _ in range(2):
+    for _ in range(10):
         # create a chromosome
         cr = Chromosome()
 
@@ -105,8 +139,8 @@ def randomize_population(edges, trucks):
 
             # start filling the truck with the sequence of edges
             for edge in cr.path[served_edges:]:
-                if t_fill + edges[edge]['garbage_weight'] <= t_capacity:
-                    t_fill += edges[edge]['garbage_weight']
+                if t_fill + edges[edge]['weight'] <= t_capacity:
+                    t_fill += edges[edge]['weight']
                     t_end += 1
                     served_edges += 1
                 else:
