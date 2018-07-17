@@ -2,7 +2,7 @@ import random
 from chromosome import Chromosome
 
 
-def crossover(parent_1, parent_2):
+def crossover(parent_1, parent_2, helper):
     print 'crossover must take place here'
     
     # select a truck from the parent 2
@@ -20,7 +20,7 @@ def crossover(parent_1, parent_2):
     for edge in subroute:
         subroute_weight += edge[2]['weight']
     
-    closest_before_subroute = 0 #get_closest_betore_edge(subroute[0])
+    closest_before_subroute = helper.closest_edge_before(subroute[0][0:2])
 
     # now create a child inserting the subroute created in the parent_1
     child = Chromosome()
@@ -46,7 +46,7 @@ def crossover(parent_1, parent_2):
                 else:
                     to_new_truck.append(edge)
 
-                if edge == closest_before_subroute: 
+                if edge[0:2] == closest_before_subroute: 
                     # MUST CHECK THE CAPACITY HERE?
                     if truck_capacity >= truck_used_capacity + subroute_weight:
                         new_end += len(subroute)

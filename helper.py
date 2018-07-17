@@ -107,3 +107,17 @@ class Helper:
         #route = nx.shortest_path(self.G, 381116687, 247123638, weight='length')
         
         return distance
+
+    def closest_edge_before(self, edge):
+        closest_edge = None
+        closest_distance = None
+        for previous_edge in self.distance_map:
+            if previous_edge == edge:
+                continue
+            if edge in self.distance_map[previous_edge]:
+                if closest_distance == None or closest_distance > self.distance_map[previous_edge][edge]:
+                    closest_distance = self.distance_map[previous_edge][edge]
+                    closest_edge = previous_edge
+        
+        return closest_edge
+            

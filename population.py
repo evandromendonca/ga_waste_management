@@ -12,37 +12,6 @@ class Population:
 
     def best_fitness(self):
         ga.get_best_fitness(self.chromosomes, self.helper)
-    #     if len(self.chromosomes) <= 0:
-    #         print 'No chromosome in this population yet'
-    #         return None
-
-    #     best_fit_chromosome = self.chromosomes[0]
-    #     for chromosome in self.chromosomes[1:]:
-    #         if chromosome.get_fitness(self.helper) < best_fit_chromosome.get_fitness(self.helper):
-    #             best_fit_chromosome = chromosome
-
-    #     print 'best fitness of: ' + str(best_fit_chromosome.get_fitness(self.helper))
-    #     return best_fit_chromosome
-
-    # def tournament_selection(self):
-    #     if len(self.chromosomes) <= 0:
-    #         print 'No chromosome in this population yet'
-    #         return None
-
-    #     print 'choosing an indivial in the population based on a tournament'
-    #     selected_chromosomes = random.sample(self.chromosomes, 5)
-
-    #     if len(selected_chromosomes) <= 0:
-    #         print 'No chromosome selected for the sample at the tournament'
-    #         return None
-        
-    #     best_fit_chromosome = selected_chromosomes[0]
-    #     for chromosome in selected_chromosomes[1:]:
-    #         if chromosome.get_fitness(self.helper) < best_fit_chromosome.get_fitness(self.helper):
-    #             best_fit_chromosome = chromosome
-
-    #     print 'best fitness of tournament: ' + str(best_fit_chromosome.get_fitness(self.helper))
-    #     return best_fit_chromosome
 
     def evolve(self):
         print 'evolving the population'
@@ -62,7 +31,7 @@ class Population:
             # must select parent 2 using TOURNAMENT SELECTION
             parent_2 = ga.tournament_selection(self.chromosomes, self.helper)            
             # crossover these chomosomes
-            child = ga.crossover(parent_1, parent_2)
+            child = ga.crossover(parent_1, parent_2, self.helper)
             # mutate at a LOW RATE
             ga.mutation(child)
 
