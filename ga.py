@@ -3,10 +3,8 @@ from chromosome import Chromosome
 
 
 def crossover(parent_1, parent_2, helper):
-    print 'crossover must take place here'
-    
     # select a truck from the parent 2
-    truck_route =  random.choice(parent_2.trucks_used)
+    truck_route = random.choice(parent_2.trucks_used)
     truck_ini = truck_route[1]
     truck_end = truck_route[2]
 
@@ -16,10 +14,10 @@ def crossover(parent_1, parent_2, helper):
     subroute_end += 1
 
     subroute = parent_2.path[subroute_ini:subroute_end]
-    subroute_weight = 0 # MUST GET THE SUBROUTE WEIGHT
+    subroute_weight = 0  # MUST GET THE SUBROUTE WEIGHT
     for edge in subroute:
         subroute_weight += edge[2]['weight']
-    
+
     closest_before_subroute = helper.closest_edge_before(subroute[0][0:2])
 
     # now create a child inserting the subroute created in the parent_1
@@ -29,7 +27,7 @@ def crossover(parent_1, parent_2, helper):
     last_end = 0
     for truck_used in parent_1.trucks_used:
         # get the edges_t of the route from trouck_used
-        truck_edges = parent_1.path[truck_used[1]:truck_used[2]] 
+        truck_edges = parent_1.path[truck_used[1]:truck_used[2]]
 
         truck_capacity = truck_used[0][1]
         truck_used_capacity = 0
@@ -37,7 +35,7 @@ def crossover(parent_1, parent_2, helper):
         new_end = last_end
 
         for edge in truck_edges:
-            if edge not in subroute: 
+            if edge not in subroute:
                 # check the capacity here
                 if truck_capacity >= truck_used_capacity + edge[2]['weight']:
                     new_end += 1
@@ -46,25 +44,51 @@ def crossover(parent_1, parent_2, helper):
                 else:
                     to_new_truck.append(edge)
 
-                if edge[0:2] == closest_before_subroute: 
+                if edge[0:2] == closest_before_subroute:
                     # MUST CHECK THE CAPACITY HERE?
                     if truck_capacity >= truck_used_capacity + subroute_weight:
                         new_end += len(subroute)
-                        truck_used_capacity += subroute_weight 
-                        child.path.append(subroute)                        
+                        truck_used_capacity += subroute_weight
+                        child.path.extend(subroute)
                     else:
-                        to_new_truck.append(subroute)
+                        to_new_truck.extend(subroute)
 
-        if new_end - new_start > 0: # MUST CHECK THE CAPACITY HERE?
-            child.trucks_used.append((truck_used[0], new_start, new_end, truck_used_capacity))
+        if new_end - new_start > 0:  # MUST CHECK THE CAPACITY HERE?
+            child.trucks_used.append(
+                (truck_used[0], new_start, new_end, truck_used_capacity))
 
         last_end = new_end
-        
-    return child
-    
 
-def mutation(chromosome):
-    print 'mutation must take place here'
+    if len(to_new_truck) > 0:
+        unallocated_edges = len(to_new_truck)
+        while unallocated_edges > 0:
+            # select a truck
+            truck = random.choice(helper.all_trucks)
+            t_fill = 0
+            t_capacity = truck[1]
+            t_start = len(child.path)
+            t_end = t_start
+            # start filling the truck with the sequence of edges
+            for edge in to_new_truck:            
+                if t_fill + edge[2]['weight'] <= t_capacity:
+                    t_fill += edge[2]['weight']
+                    t_end += 1
+                    child.path.append(edge)
+                    unallocated_edges -= 1
+                else:
+                    # the truck is full loaded, stop the loop and chose other truck to complete the job
+                    break
+
+            # here we must check if the truck will join the list of route trucks
+            # if the truck drived at least one edge, add it to the list
+            if t_end - t_start > 0:
+                child.trucks_used.append((truck, t_start, t_end, t_fill))
+
+    return child
+
+
+# def mutation(chromosome):
+#     print 'mutation must take place here'
 
 
 def tournament_selection(chromosomes, helper):
@@ -72,19 +96,20 @@ def tournament_selection(chromosomes, helper):
         print 'No chromosome in this population yet'
         return None
 
-    print 'choosing an indivial in the population based on a tournament'
+    # choosing an indivial in the population based on a tournament
     selected_chromosomes = random.sample(chromosomes, 5)
 
     if len(selected_chromosomes) <= 0:
         print 'No chromosome selected for the sample at the tournament'
         return None
-    
+
     best_fit_chromosome = selected_chromosomes[0]
     for chromosome in selected_chromosomes[1:]:
         if chromosome.get_fitness(helper) < best_fit_chromosome.get_fitness(helper):
             best_fit_chromosome = chromosome
 
-    print 'best fitness of tournament: ' + str(best_fit_chromosome.get_fitness(helper))
+    # print 'best fitness of tournament: ' + \
+    #   str(best_fit_chromosome.get_fitness(helper))
     return best_fit_chromosome
 
 
@@ -98,8 +123,9 @@ def get_best_fitness(chromosomes, helper):
         if chromosome.get_fitness(helper) < best_fit_chromosome.get_fitness(helper):
             best_fit_chromosome = chromosome
 
-    print 'best fitness of: ' + str(best_fit_chromosome.get_fitness(helper))
+    #print 'best fitness of: ' + str(best_fit_chromosome.get_fitness(helper))
     return best_fit_chromosome
+
 
 def randomize_population(edges, trucks):
     chromosomes = []

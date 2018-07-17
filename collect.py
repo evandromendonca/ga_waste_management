@@ -104,8 +104,9 @@ except:
     print 'could not open the campolide_graph or lisbon_graph from file, try to download it'
     # Getting city data from Open Street Maps
     G = ox.graph_from_place('Campolide, Lisboa', network_type='drive')
-    G_lisbon = ox.graph_from_place('Lisbon, Portugal', network_type='drive', which_result=2)
-    
+    G_lisbon = ox.graph_from_place(
+        'Lisbon, Portugal', network_type='drive', which_result=2)
+
     print 'got osm data downloaded for Campolide and Lisbon with OSMnx'
 
     # save street network as GraphML file
@@ -157,24 +158,23 @@ trucks = [
 ]
 
 # create a helper
-helper = Helper(G_lisbon)
+helper = Helper(G_lisbon, trucks)
 
 # calculate each campolide edge distance
 #distance_map = helper.build_distance_map(G.edges)
-distance_map = helper.build_distance_map_from_files('edges.csv', 'distances.csv')
+distance_map = helper.build_distance_map_from_files(
+    'edges.csv', 'distances.csv')
 
 # randomize the initial population
 population = Population(helper, G.edges(data=True), trucks, True)
-print 'initial population best fitness:'
-population.best_fitness()
+print 'initial population best fitness: ' + str(population.get_best_fitness().fitness) + ' best fitness paths number: ' + str(len(population.get_best_fitness().path))
 
-for i in range(40):
+# evolving
+for i in range(500):
     population = population.evolve()
-    print 'iteration ' + str(i) + ' best fitness:'
-    population.best_fitness()
+    print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + ' best fitness paths number: ' + str(len(population.get_best_fitness().path))    
 
-print 'final population best fitness:'
-population.best_fitness()
+print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' best fitness paths number: ' + str(len(population.get_best_fitness().path))
 
 # # plot the graph
 # print 'plooting'
