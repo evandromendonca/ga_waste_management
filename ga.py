@@ -13,9 +13,13 @@ def crossover(parent_1, parent_2):
     # select a subroute from the chosen truck_route
     subroute_ini = random.randint(truck_ini, truck_end - 1)
     subroute_end = random.randint(subroute_ini, truck_end - 1)
+    subroute_end += 1
 
     subroute = parent_2.path[subroute_ini:subroute_end]
     subroute_weight = 0 # MUST GET THE SUBROUTE WEIGHT
+    for edge in subroute:
+        subroute_weight += edge[2]['weight']
+    
     closest_before_subroute = 0 #get_closest_betore_edge(subroute[0])
 
     # now create a child inserting the subroute created in the parent_1
@@ -35,9 +39,9 @@ def crossover(parent_1, parent_2):
         for edge in truck_edges:
             if edge not in subroute: 
                 # check the capacity here
-                if truck_capacity >= truck_used_capacity + edge['garbage_weight']:
+                if truck_capacity >= truck_used_capacity + edge[2]['weight']:
                     new_end += 1
-                    truck_used_capacity += edge['garbage_weight']
+                    truck_used_capacity += edge[2]['weight']
                     child.path.append(edge)
                 else:
                     to_new_truck.append(edge)
@@ -52,7 +56,7 @@ def crossover(parent_1, parent_2):
                         to_new_truck.append(subroute)
 
         if new_end - new_start > 0: # MUST CHECK THE CAPACITY HERE?
-            child.trucks_used.append((truck_used, new_start, new_end))
+            child.trucks_used.append((truck_used[0], new_start, new_end, truck_used_capacity))
 
         last_end = new_end
         
@@ -139,8 +143,8 @@ def randomize_population(edges, trucks):
 
             # start filling the truck with the sequence of edges
             for edge in cr.path[served_edges:]:
-                if t_fill + edges[edge]['weight'] <= t_capacity:
-                    t_fill += edges[edge]['weight']
+                if t_fill + edge[2]['weight'] <= t_capacity:
+                    t_fill += edge[2]['weight']
                     t_end += 1
                     served_edges += 1
                 else:

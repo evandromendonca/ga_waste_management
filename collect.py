@@ -164,7 +164,7 @@ helper = Helper(G_lisbon)
 distance_map = helper.build_distance_map_from_files('edges.csv', 'distances.csv')
 
 # randomize the initial population
-population = Population(helper, G.edges, trucks, True)
+population = Population(helper, G.edges(data=True), trucks, True)
 print 'initial population best fitness:'
 population.best_fitness()
 

@@ -6,6 +6,15 @@ class Helper:
         self.G = graph
         self.distance_map = None
 
+    def parse_tuple(self, string):
+        try:
+            s = eval(str(string))
+            if type(s) == tuple:
+                return s
+            return
+        except:
+            return
+
     def build_distance_map(self, edges):
         print 'calculating distance map'
         distance_map = {}
@@ -55,10 +64,10 @@ class Helper:
                     splitted_edges = edge_line.split(';')
                     splitted_distances = distance_line.split(';')
 
-                    self.distance_map[splitted_edges[0]] = {}
+                    self.distance_map[self.parse_tuple(splitted_edges[0])] = {}
 
                     for j in range(1, len(splitted_edges)):
-                        self.distance_map[splitted_edges[0]][splitted_edges[j]] = splitted_distances[j - 1]
+                        self.distance_map[self.parse_tuple(splitted_edges[0])][self.parse_tuple(splitted_edges[j])] = float(splitted_distances[j - 1])
 
                 # for line_edges in edges_f:
                 #     line_distance = distance_f.readline()
@@ -78,17 +87,17 @@ class Helper:
         
         distance = 0
         if num_edges == 1:
-            distance += float(self.distance_map[str(edges[0])][str(edges[0])])
+            distance += self.distance_map[edges[0][0:2]][edges[0][0:2]]
             return distance
 
-        #print 'distance between '+ str(edges[0]) +' and '+ str(edges[1]) + ' = ' + str(self.distance_map[str(edges[0])][str(edges[1])])
-        distance += float(self.distance_map[str(edges[0])][str(edges[1])])
+        #print 'distance between '+ str(edges[0][0:2]) +' and '+ str(edges[1][0:2]) + ' = ' + str(self.distance_map[edges[0][0:2]][edges[1][0:2]])
+        distance += self.distance_map[edges[0][0:2]][edges[1][0:2]]
 
         for i in range(2, len(edges[2:])):
-            #print 'distance between '+ str(edges[i - 1])+ ' and '+ str(edges[i]) + ' = ' + str(self.distance_map[str(edges[i - 1])][str(edges[i])])
-            distance += float(self.distance_map[str(edges[i - 1])][str(edges[i])])
+            #print 'distance between '+ str(edges[i - 1][0:2])+ ' and '+ str(edges[i][0:2]) + ' = ' + str(self.distance_map[edges[i - 1][0:2]][edges[i][0:2]])
+            distance += self.distance_map[edges[i - 1][0:2]][edges[i][0:2]]
             #print 'distance between '+ str(edges[i - 1]) +' and '+ str(edges[i - 1]) + ' = ' + str(self.distance_map[str(edges[i - 1])][str(edges[i - 1])])
-            distance -= float(self.distance_map[str(edges[i - 1])][str(edges[i - 1])])
+            distance -= self.distance_map[edges[i - 1][0:2]][edges[i - 1][0:2]]
             
         # # if one wants to see the route
         # route = nx.shortest_path(self.G, node_1, node_2, weight='length')
