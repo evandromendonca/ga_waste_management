@@ -104,12 +104,10 @@ if where_am_i == "HOME":
     CAMPOLIDE_GRAPH = 'campolide_graph.graphml'
     LISBON_GRAPH = 'lisbon_graph.graphml'
     EDGES_FILE = 'edges.csv'
-    DISTANCE_FILE = 'distances.csv'
 else:
     CAMPOLIDE_GRAPH = 'TE_campolide_graph.graphml'
     LISBON_GRAPH = 'TE_lisbon_graph.graphml'
     EDGES_FILE = 'TE_edges.csv'
-    DISTANCES_FILE = 'TE_distances.csv'
 
 try:
     print 'about to open campolide_graph and lisbon_graph from file'
@@ -177,7 +175,7 @@ trucks = [
 helper = Helper(G_lisbon, trucks)
 
 # calculate each campolide edge distance
-#distance_map = helper.build_distance_map(G.edges, EDGES_FILE, DISTANCES_FILE)
+#distance_map = helper.build_distance_map(G.edges, EDGES_FILE)
 distance_map = helper.build_distance_map_from_files(EDGES_FILE)
 
 duplicates = [item for item, count in collections.Counter(

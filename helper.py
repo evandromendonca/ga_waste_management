@@ -17,7 +17,7 @@ class Helper:
         except:
             return
 
-    def build_distance_map(self, edges, edges_file, distances_file):
+    def build_distance_map(self, edges, edges_file):
         print 'calculating distance map'
         distance_map = {}
 
