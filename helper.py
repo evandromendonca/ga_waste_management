@@ -26,7 +26,10 @@ class Helper:
         for edge_from in edges:
             counter += 1
             print 'working on ' + str(counter) + ' edge of the total ' + str(total_edges) + ' edges'
-            distance_map[edge_from] = {}
+            
+            if edge_from not in distance_map:
+                distance_map[edge_from] = {}
+
             for edge_to in edges:
                 # edge_from to edge_from
                 distance_edge_from = self.G.edges[edge_from]['length']
@@ -36,8 +39,9 @@ class Helper:
                 # edge_to to edge_to
                 if edge_from != edge_to:
                     distance_edge_to = self.G.edges[edge_to]['length']
-                    if edge_to in distance_map and edge_to not in distance_map[edge_to]:
-                        distance_map[edge_to][edge_to] = distance_edge_to
+                    if edge_to in distance_map:          
+                        if edge_to not in distance_map[edge_to]:
+                            distance_map[edge_to][edge_to] = distance_edge_to
                     else:
                         distance_map[edge_to] = {edge_to: distance_edge_to}
 
