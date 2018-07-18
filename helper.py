@@ -61,6 +61,7 @@ class Helper:
 
         with open(edges_file, 'w') as edges_f:
             edges_f.write('Source;Destinations')
+            edges_f.write('\n')
             for edge in distance_map:
                 edges_f.write(str(edge))
                 for inner_edge in distance_map[edge]:
@@ -115,25 +116,39 @@ class Helper:
 
         return distance_map
 
-    def build_distance_map_from_files(self, edges_file, distances_file):
+    def build_distance_map_from_files(self, edges_file):
         self.distance_map = {}
 
         with open(edges_file, 'r') as edges_f:
-            with open(distances_file, 'r') as distance_f:
-                edges_lines = edges_f.read().splitlines()
-                distances_lines = distance_f.read().splitlines()
-                for i in range(1, len(edges_lines)):
-                    edge_line = edges_lines[i]
-                    distance_line = distances_lines[i - 1]
+            edges_lines = edges_f.read().splitlines()
 
-                    splitted_edges = edge_line.split(';')
-                    splitted_distances = distance_line.split(';')
+            for edge_line in edges_lines[1:]:
+                splitted_edges = edge_line.split(';')
 
-                    self.distance_map[self.parse_tuple(splitted_edges[0])] = {}
+                self.distance_map[self.parse_tuple(splitted_edges[0])] = {}
+                
+                for inner_edge in splitted_edges[1:]:
+                    split = inner_edge.split("|")
+                    edge = split [0]
+                    distance = split[1]
+                    self.distance_map[self.parse_tuple(splitted_edges[0])][self.parse_tuple(edge)] = float(distance)
 
-                    for j in range(1, len(splitted_edges)):
-                        self.distance_map[self.parse_tuple(splitted_edges[0])][self.parse_tuple(
-                            splitted_edges[j])] = float(splitted_distances[j - 1])
+        # with open(edges_file, 'r') as edges_f:
+        #     #with open(distances_file, 'r') as distance_f:
+        #     edges_lines = edges_f.read().splitlines()
+        #     #distances_lines = distance_f.read().splitlines()
+        #     for i in range(1, len(edges_lines)):
+        #         edge_line = edges_lines[i]
+        #         #distance_line = distances_lines[i - 1]
+
+        #         splitted_edges = edge_line.split(';')
+        #         #splitted_distances = distance_line.split(';')
+
+        #         self.distance_map[self.parse_tuple(splitted_edges[0])] = {}
+
+        #         for j in range(1, len(splitted_edges)):
+        #             self.distance_map[self.parse_tuple(splitted_edges[0])][self.parse_tuple(
+        #                 splitted_edges[j])] = float(splitted_distances[j - 1])
 
                 # for line_edges in edges_f:
                 #     line_distance = distance_f.readline()
@@ -153,17 +168,17 @@ class Helper:
 
         distance = 0
         if num_edges == 1:
-            distance += self.distance_map[edges[0][0:2]][edges[0][0:2]]
+            distance += self.distance_map[edges[0][0:3]][edges[0][0:3]]
             return distance
 
         #print 'distance between '+ str(edges[0][0:2]) +' and '+ str(edges[1][0:2]) + ' = ' + str(self.distance_map[edges[0][0:2]][edges[1][0:2]])
-        distance += self.distance_map[edges[0][0:2]][edges[1][0:2]]
+        distance += self.distance_map[edges[0][0:3]][edges[1][0:3]]
 
         for i in range(2, len(edges[2:])):
             #print 'distance between '+ str(edges[i - 1][0:2])+ ' and '+ str(edges[i][0:2]) + ' = ' + str(self.distance_map[edges[i - 1][0:2]][edges[i][0:2]])
-            distance += self.distance_map[edges[i - 1][0:2]][edges[i][0:2]]
+            distance += self.distance_map[edges[i - 1][0:3]][edges[i][0:3]]
             #print 'distance between '+ str(edges[i - 1]) +' and '+ str(edges[i - 1]) + ' = ' + str(self.distance_map[str(edges[i - 1])][str(edges[i - 1])])
-            distance -= self.distance_map[edges[i - 1][0:2]][edges[i - 1][0:2]]
+            distance -= self.distance_map[edges[i - 1][0:3]][edges[i - 1][0:3]]
 
         # # if one wants to see the route
         # route = nx.shortest_path(self.G, node_1, node_2, weight='length')
@@ -177,7 +192,7 @@ class Helper:
     def closest_edge_before(self, edges):
         closest_edge = None
         closest_distance = None
-        edges_list = [edge[0:2] for edge in edges]
+        edges_list = [edge[0:3] for edge in edges]
         for previous_edge in self.distance_map:
             if previous_edge in edges_list:
                 continue

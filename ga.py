@@ -19,7 +19,7 @@ def crossover(parent_1, parent_2, helper):
     subroute = parent_2.path[subroute_ini:subroute_end]
     subroute_weight = 0  # MUST GET THE SUBROUTE WEIGHT
     for edge in subroute:
-        subroute_weight += edge[2]['weight']
+        subroute_weight += edge[3]['weight']
 
     if len(subroute) <= 0:
         print 'deu merda'
@@ -28,7 +28,7 @@ def crossover(parent_1, parent_2, helper):
 
     c = False
     for edge in parent_1.path:
-        if edge[0:2] == closest_before_subroute:
+        if edge[0:3] == closest_before_subroute:
             c = True
     if c == False:
         print 'deu merda'
@@ -56,14 +56,14 @@ def crossover(parent_1, parent_2, helper):
                     print 'repetido'
 
                 # check the capacity here
-                if truck_capacity >= truck_used_capacity + edge[2]['weight']:
+                if truck_capacity >= truck_used_capacity + edge[3]['weight']:
                     new_end += 1
-                    truck_used_capacity += edge[2]['weight']
+                    truck_used_capacity += edge[3]['weight']
                     child.path.append(edge)
                 else:
                     to_new_truck.append(edge)
 
-                if edge[0:2] == closest_before_subroute:
+                if edge[0:3] == closest_before_subroute:
                     # check the capacity here
                     if truck_capacity >= truck_used_capacity + subroute_weight:
                         new_end += len(subroute)
@@ -95,8 +95,8 @@ def crossover(parent_1, parent_2, helper):
             t_end = t_start
             # start filling the truck with the sequence of edges
             for edge in to_new_truck[served_edges:]:            
-                if t_fill + edge[2]['weight'] <= t_capacity:
-                    t_fill += edge[2]['weight']
+                if t_fill + edge[3]['weight'] <= t_capacity:
+                    t_fill += edge[3]['weight']
                     t_end += 1
                     child.path.append(edge)
                     served_edges += 1
@@ -108,9 +108,15 @@ def crossover(parent_1, parent_2, helper):
             # if the truck drived at least one edge, add it to the list
             if t_end - t_start > 0:
                 child.trucks_used.append((truck, t_start, t_end, t_fill))
+    
+    if len(child.path) != 473:
+        print 'child greater than expected'
 
-    print 'child path length === ' + str(len(child.path))
-    print [item for item, count in collections.Counter([edge[0:2] for edge in child.path]).items() if count > 1]
+    duplicates = [item for item, count in collections.Counter([edge[0:3] for edge in child.path]).items() if count > 1]
+    if len(duplicates) > 0:
+        print 'duplicates found:'
+        print duplicates
+
     return child
 
 
@@ -196,8 +202,8 @@ def randomize_population(edges, trucks):
 
             # start filling the truck with the sequence of edges
             for edge in cr.path[served_edges:]:
-                if t_fill + edge[2]['weight'] <= t_capacity:
-                    t_fill += edge[2]['weight']
+                if t_fill + edge[3]['weight'] <= t_capacity:
+                    t_fill += edge[3]['weight']
                     t_end += 1
                     served_edges += 1
                 else:

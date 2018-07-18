@@ -177,18 +177,17 @@ trucks = [
 helper = Helper(G_lisbon, trucks)
 
 # calculate each campolide edge distance
-distance_map = helper.build_distance_map(G.edges, EDGES_FILE, DISTANCES_FILE)
-distance_map = helper.build_distance_map_from_files(
-    EDGES_FILE, DISTANCES_FILE)
+#distance_map = helper.build_distance_map(G.edges, EDGES_FILE, DISTANCES_FILE)
+distance_map = helper.build_distance_map_from_files(EDGES_FILE)
 
 duplicates = [item for item, count in collections.Counter(
-    [edge[0:2] for edge in G.edges(data=True)]).items() if count > 1]
+    [edge for edge in G.edges]).items() if count > 1]
 if len(duplicates) > 0:
     print 'duplicates in chromosome'
     print duplicates
 
 # randomize the initial population
-population = Population(helper, G.edges(data=True), trucks, True)
+population = Population(helper, G.edges(keys=True, data=True), trucks, True)
 print 'initial population best fitness: ' + str(population.get_best_fitness(
 ).fitness) + ' best fitness paths number: ' + str(len(population.get_best_fitness().path))
 
@@ -199,8 +198,7 @@ for i in range(500):
         ' best fitness paths number: ' + \
         str(len(population.get_best_fitness().path))
 
-print 'final population best fitness: ' + str(population.get_best_fitness(
-).fitness) + ' best fitness paths number: ' + str(len(population.get_best_fitness().path))
+print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' best fitness paths number: ' + str(len(population.get_best_fitness().path))
 
 # # plot the graph
 # print 'plooting'
