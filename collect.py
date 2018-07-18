@@ -11,6 +11,7 @@ import random
 import ga
 from population import Population
 from helper import Helper
+import collections
 
 
 def read_file():
@@ -145,7 +146,7 @@ print 'We have (' + str(G.number_of_nodes()) + \
 
 # Must attribute a weight of garbage to each edge
 for edge in G.edges:
-    G.edges[edge]['weight'] = random.randint(1, 100)
+    G.edges[edge]['weight'] = 100 #random.randint(1, 100)
     #G_lisbon.edges[edge]['weight'] = random.randint(1, 100)
 
 # available trucks must also be presented
@@ -164,6 +165,11 @@ helper = Helper(G_lisbon, trucks)
 #distance_map = helper.build_distance_map(G.edges)
 distance_map = helper.build_distance_map_from_files(
     'edges.csv', 'distances.csv')
+
+duplicates = [item for item, count in collections.Counter([edge[0:2] for edge in G.edges(data=True)]).items() if count > 1]
+if len(duplicates) > 0:
+    print 'duplicates in chromosome'
+    print duplicates
 
 # randomize the initial population
 population = Population(helper, G.edges(data=True), trucks, True)

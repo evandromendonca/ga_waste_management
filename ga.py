@@ -1,6 +1,6 @@
 import random
 from chromosome import Chromosome
-
+import collections
 
 def crossover(parent_1, parent_2, helper):
     # select a truck from the parent 2
@@ -13,15 +13,30 @@ def crossover(parent_1, parent_2, helper):
     subroute_end = random.randint(subroute_ini, truck_end - 1)
     subroute_end += 1
 
+    if subroute_end - subroute_ini <= 0:
+        print 'deu merda'
+
     subroute = parent_2.path[subroute_ini:subroute_end]
     subroute_weight = 0  # MUST GET THE SUBROUTE WEIGHT
     for edge in subroute:
         subroute_weight += edge[2]['weight']
 
-    closest_before_subroute = helper.closest_edge_before(subroute[0][0:2])
+    if len(subroute) <= 0:
+        print 'deu merda'
+
+    closest_before_subroute = helper.closest_edge_before(subroute)
+
+    c = False
+    for edge in parent_1.path:
+        if edge[0:2] == closest_before_subroute:
+            c = True
+    if c == False:
+        print 'deu merda'
 
     # now create a child inserting the subroute created in the parent_1
     child = Chromosome()
+
+    e_count = 0
 
     to_new_truck = []
     last_end = 0
@@ -34,8 +49,12 @@ def crossover(parent_1, parent_2, helper):
         new_start = last_end
         new_end = last_end
 
-        for edge in truck_edges:
+        for edge in truck_edges:            
+            e_count += 1
             if edge not in subroute:
+                if edge in child.path:
+                    print 'repetido'
+
                 # check the capacity here
                 if truck_capacity >= truck_used_capacity + edge[2]['weight']:
                     new_end += 1
@@ -45,7 +64,7 @@ def crossover(parent_1, parent_2, helper):
                     to_new_truck.append(edge)
 
                 if edge[0:2] == closest_before_subroute:
-                    # MUST CHECK THE CAPACITY HERE?
+                    # check the capacity here
                     if truck_capacity >= truck_used_capacity + subroute_weight:
                         new_end += len(subroute)
                         truck_used_capacity += subroute_weight
@@ -53,15 +72,21 @@ def crossover(parent_1, parent_2, helper):
                     else:
                         to_new_truck.extend(subroute)
 
-        if new_end - new_start > 0:  # MUST CHECK THE CAPACITY HERE?
+        if new_end - new_start > 0: 
             child.trucks_used.append(
                 (truck_used[0], new_start, new_end, truck_used_capacity))
 
         last_end = new_end
 
+    if e_count != len(parent_1.path):
+        print 'deu merda'
+
+    if len(child.path) + len(to_new_truck) != len(parent_1.path):
+        print 'deu merda'
+
     if len(to_new_truck) > 0:
-        unallocated_edges = len(to_new_truck)
-        while unallocated_edges > 0:
+        served_edges = 0
+        while served_edges < len(to_new_truck):
             # select a truck
             truck = random.choice(helper.all_trucks)
             t_fill = 0
@@ -69,12 +94,12 @@ def crossover(parent_1, parent_2, helper):
             t_start = len(child.path)
             t_end = t_start
             # start filling the truck with the sequence of edges
-            for edge in to_new_truck:            
+            for edge in to_new_truck[served_edges:]:            
                 if t_fill + edge[2]['weight'] <= t_capacity:
                     t_fill += edge[2]['weight']
                     t_end += 1
                     child.path.append(edge)
-                    unallocated_edges -= 1
+                    served_edges += 1
                 else:
                     # the truck is full loaded, stop the loop and chose other truck to complete the job
                     break
@@ -84,6 +109,8 @@ def crossover(parent_1, parent_2, helper):
             if t_end - t_start > 0:
                 child.trucks_used.append((truck, t_start, t_end, t_fill))
 
+    print 'child path length === ' + str(len(child.path))
+    print [item for item, count in collections.Counter([edge[0:2] for edge in child.path]).items() if count > 1]
     return child
 
 

@@ -58,6 +58,47 @@ class Helper:
 
         return distance_map
 
+    def build_distance_map_2(self, edges):
+        print 'calculating distance map'
+        distance_map = {}
+
+        for edge_from in edges:
+            distance_map[edge_from['osmid']] = {}
+
+            for edge_to in edges:
+                if edge_from['osmid'] in distance_map and edge_from['osmid'] in distance_map[edge_from['osmid']]:
+                    distance_edge_from = distance_map[edge_from['osmid']][edge_from['osmid']]
+                else:
+                    distance_edge_from = nx.shortest_path_length(
+                        self.G, edge_from[0], edge_from[1], weight='length')
+                    distance_map[edge_from['osmid']][edge_from['osmid']] = distance_edge_from
+
+                if edge_to in distance_map and edge_to in distance_map[edge_to]:
+                    distance_edge_to = distance_map[edge_to][edge_to]
+                else:
+                    distance_edge_to = nx.shortest_path_length(
+                        self.G, edge_to[0], edge_to[1], weight='length')
+                    if edge_to in distance_map:
+                        distance_map[edge_to][edge_to] = distance_edge_to
+                    else:
+                        distance_map[edge_to] = {edge_to: distance_edge_to}
+
+                # must check here, because it can be added in the previous ifs
+                if edge_to not in distance_map[edge_from]:
+                    try:
+                        last_node_edge_from = edge_from[1]
+                        first_node_edge_to = edge_to[0]
+                        distance_between_edges = nx.shortest_path_length(
+                            self.G, last_node_edge_from, first_node_edge_to, weight='length')
+                        distance_map[edge_from][edge_to] = distance_edge_from + \
+                            distance_between_edges + distance_edge_to
+                    except:
+                        print 'ERROR: fiding route between ' + \
+                            str(last_node_edge_from) + \
+                            ' and ' + str(first_node_edge_to)
+
+        return distance_map
+
     def build_distance_map_from_files(self, edges_file, distances_file):
         self.distance_map = {}
 
@@ -117,15 +158,16 @@ class Helper:
 
         return distance
 
-    def closest_edge_before(self, edge):
+    def closest_edge_before(self, edges):
         closest_edge = None
         closest_distance = None
+        edges_list = [edge[0:2] for edge in edges]
         for previous_edge in self.distance_map:
-            if previous_edge == edge:
+            if previous_edge in edges_list:
                 continue
-            if edge in self.distance_map[previous_edge]:
-                if closest_distance == None or closest_distance > self.distance_map[previous_edge][edge]:
-                    closest_distance = self.distance_map[previous_edge][edge]
+            if edges_list[0] in self.distance_map[previous_edge]:
+                if closest_distance == None or closest_distance > self.distance_map[previous_edge][edges_list[0]]:
+                    closest_distance = self.distance_map[previous_edge][edges_list[0]]
                     closest_edge = previous_edge
 
         return closest_edge
