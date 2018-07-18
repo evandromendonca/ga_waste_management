@@ -17,27 +17,26 @@ class Helper:
         except:
             return
 
-    def build_distance_map(self, edges):
+    def build_distance_map(self, edges, edges_file, distances_file):
         print 'calculating distance map'
         distance_map = {}
 
+        total_edges = len(edges)
+        counter = 0
         for edge_from in edges:
+            counter += 1
+            print 'working on ' + str(counter) + ' edge of the total ' + str(total_edges) + ' edges'
             distance_map[edge_from] = {}
-
             for edge_to in edges:
-                if edge_from in distance_map and edge_from in distance_map[edge_from]:
-                    distance_edge_from = distance_map[edge_from][edge_from]
-                else:
-                    distance_edge_from = nx.shortest_path_length(
-                        self.G, edge_from[0], edge_from[1], weight='length')
+                # edge_from to edge_from
+                distance_edge_from = self.G.edges[edge_from]['length']
+                if edge_from not in distance_map[edge_from]:
                     distance_map[edge_from][edge_from] = distance_edge_from
 
-                if edge_to in distance_map and edge_to in distance_map[edge_to]:
-                    distance_edge_to = distance_map[edge_to][edge_to]
-                else:
-                    distance_edge_to = nx.shortest_path_length(
-                        self.G, edge_to[0], edge_to[1], weight='length')
-                    if edge_to in distance_map:
+                # edge_to to edge_to
+                if edge_from != edge_to:
+                    distance_edge_to = self.G.edges[edge_to]['length']
+                    if edge_to in distance_map and edge_to not in distance_map[edge_to]:
                         distance_map[edge_to][edge_to] = distance_edge_to
                     else:
                         distance_map[edge_to] = {edge_to: distance_edge_to}
@@ -56,6 +55,17 @@ class Helper:
                             str(last_node_edge_from) + \
                             ' and ' + str(first_node_edge_to)
 
+        with open(edges_file, 'w') as edges_f:
+            edges_f.write('Source;Destinations')
+            for edge in distance_map:
+                edges_f.write(str(edge))
+                for inner_edge in distance_map[edge]:
+                    edges_f.write(';')
+                    edges_f.write(str(inner_edge))
+                    edges_f.write("|")
+                    edges_f.write(str(distance_map[edge][inner_edge]))
+                edges_f.write('\n')
+
         return distance_map
 
     def build_distance_map_2(self, edges):
@@ -67,11 +77,13 @@ class Helper:
 
             for edge_to in edges:
                 if edge_from['osmid'] in distance_map and edge_from['osmid'] in distance_map[edge_from['osmid']]:
-                    distance_edge_from = distance_map[edge_from['osmid']][edge_from['osmid']]
+                    distance_edge_from = distance_map[edge_from['osmid']
+                                                      ][edge_from['osmid']]
                 else:
                     distance_edge_from = nx.shortest_path_length(
                         self.G, edge_from[0], edge_from[1], weight='length')
-                    distance_map[edge_from['osmid']][edge_from['osmid']] = distance_edge_from
+                    distance_map[edge_from['osmid']
+                                 ][edge_from['osmid']] = distance_edge_from
 
                 if edge_to in distance_map and edge_to in distance_map[edge_to]:
                     distance_edge_to = distance_map[edge_to][edge_to]

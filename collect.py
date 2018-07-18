@@ -97,9 +97,24 @@ def do():
 # OpenStreetMaps: https://www.openstreetmap.org/relation/5400890#map=12/38.7441/-9.1581
 # ----------------------------------------------------------------------------------
 
+# WHERE AM I ? TE OR HOME
+where_am_i = "TE"
+
+if where_am_i == "HOME":
+    CAMPOLIDE_GRAPH = 'campolide_graph.graphml'
+    LISBON_GRAPH = 'lisbon_graph.graphml'
+    EDGES_FILE = 'edges.csv'
+    DISTANCE_FILE = 'distances.csv'
+else:
+    CAMPOLIDE_GRAPH = 'TE_campolide_graph.graphml'
+    LISBON_GRAPH = 'TE_lisbon_graph.graphml'
+    EDGES_FILE = 'TE_edges.csv'
+    DISTANCES_FILE = 'TE_distances.csv'
+
 try:
-    G = ox.load_graphml('campolide_graph.graphml')
-    G_lisbon = ox.load_graphml('lisbon_graph.graphml')
+    print 'about to open campolide_graph and lisbon_graph from file'
+    G = ox.load_graphml(CAMPOLIDE_GRAPH)
+    G_lisbon = ox.load_graphml(LISBON_GRAPH)
     print 'opened the campolide_graph and lisbon_graph from file'
 except:
     print 'could not open the campolide_graph or lisbon_graph from file, try to download it'
@@ -114,8 +129,8 @@ except:
     print 'saving the network and graph in the disk'
     G_projected = ox.project_graph(G)
     G_projected_lisbon = ox.project_graph(G_lisbon)
-    ox.save_graphml(G_projected, filename='campolide_graph.graphml')
-    ox.save_graphml(G_projected_lisbon, filename='lisbon_graph.graphml')
+    ox.save_graphml(G_projected, filename=CAMPOLIDE_GRAPH)
+    ox.save_graphml(G_projected_lisbon, filename=LISBON_GRAPH)
     print 'done saving in the disk'
 
 print 'We have (' + str(G.number_of_nodes()) + \
@@ -125,7 +140,7 @@ print 'We have (' + str(G.number_of_nodes()) + \
 # ox.plot_graph(G)
 
 # Keep the edges that are not residential or secondary from the map
-print 'only let the residential and secondary nodes pass'
+print 'only let residential and secondary nodes at Campolide graph'
 edges_to_remove = []
 for edge in G.edges:
     if (G.edges[edge]['highway'] != 'residential' and G.edges[edge]['highway'] != 'secondary'):
@@ -146,7 +161,7 @@ print 'We have (' + str(G.number_of_nodes()) + \
 
 # Must attribute a weight of garbage to each edge
 for edge in G.edges:
-    G.edges[edge]['weight'] = 100 #random.randint(1, 100)
+    G.edges[edge]['weight'] = 100  # random.randint(1, 100)
     #G_lisbon.edges[edge]['weight'] = random.randint(1, 100)
 
 # available trucks must also be presented
@@ -162,25 +177,30 @@ trucks = [
 helper = Helper(G_lisbon, trucks)
 
 # calculate each campolide edge distance
-#distance_map = helper.build_distance_map(G.edges)
+distance_map = helper.build_distance_map(G.edges, EDGES_FILE, DISTANCES_FILE)
 distance_map = helper.build_distance_map_from_files(
-    'edges.csv', 'distances.csv')
+    EDGES_FILE, DISTANCES_FILE)
 
-duplicates = [item for item, count in collections.Counter([edge[0:2] for edge in G.edges(data=True)]).items() if count > 1]
+duplicates = [item for item, count in collections.Counter(
+    [edge[0:2] for edge in G.edges(data=True)]).items() if count > 1]
 if len(duplicates) > 0:
     print 'duplicates in chromosome'
     print duplicates
 
 # randomize the initial population
 population = Population(helper, G.edges(data=True), trucks, True)
-print 'initial population best fitness: ' + str(population.get_best_fitness().fitness) + ' best fitness paths number: ' + str(len(population.get_best_fitness().path))
+print 'initial population best fitness: ' + str(population.get_best_fitness(
+).fitness) + ' best fitness paths number: ' + str(len(population.get_best_fitness().path))
 
 # evolving
 for i in range(500):
     population = population.evolve()
-    print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + ' best fitness paths number: ' + str(len(population.get_best_fitness().path))    
+    print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + \
+        ' best fitness paths number: ' + \
+        str(len(population.get_best_fitness().path))
 
-print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' best fitness paths number: ' + str(len(population.get_best_fitness().path))
+print 'final population best fitness: ' + str(population.get_best_fitness(
+).fitness) + ' best fitness paths number: ' + str(len(population.get_best_fitness().path))
 
 # # plot the graph
 # print 'plooting'
