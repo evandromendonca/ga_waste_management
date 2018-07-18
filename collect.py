@@ -98,7 +98,7 @@ def do():
 # ----------------------------------------------------------------------------------
 
 # WHERE AM I ? TE OR HOME
-where_am_i = "TE"
+where_am_i = "HOME"
 
 if where_am_i == "HOME":
     CAMPOLIDE_GRAPH = 'campolide_graph.graphml'
