@@ -2,6 +2,8 @@ import random
 from chromosome import Chromosome
 import collections
 
+# this is to check the performance using line_profiler @ https://github.com/rkern/line_profiler
+#@profile 
 def crossover(parent_1, parent_2, helper):
     # select a truck from the parent 2
     truck_route = random.choice(parent_2.trucks_used)
@@ -13,30 +15,32 @@ def crossover(parent_1, parent_2, helper):
     subroute_end = random.randint(subroute_ini, truck_end - 1)
     subroute_end += 1
 
-    if subroute_end - subroute_ini <= 0:
-        print 'deu merda'
+    #if subroute_end - subroute_ini <= 0:
+    #    print 'deu merda'
 
     subroute = parent_2.path[subroute_ini:subroute_end]
-    subroute_weight = 0  # MUST GET THE SUBROUTE WEIGHT
+    
+    # Must get the subroute weight
+    subroute_weight = 0  
     for edge in subroute:
         subroute_weight += edge[3]['weight']
 
-    if len(subroute) <= 0:
-        print 'deu merda'
+    #if len(subroute) <= 0:
+    #    print 'deu merda'
 
     closest_before_subroute = helper.closest_edge_before(subroute)
 
-    c = False
-    for edge in parent_1.path:
-        if edge[0:3] == closest_before_subroute:
-            c = True
-    if c == False:
-        print 'deu merda'
+    # c = False
+    # for edge in parent_1.path:
+    #     if edge[0:3] == closest_before_subroute:
+    #         c = True
+    # if c == False:
+    #     print 'deu merda'
 
     # now create a child inserting the subroute created in the parent_1
     child = Chromosome()
 
-    e_count = 0
+    #e_count = 0
 
     to_new_truck = []
     last_end = 0
@@ -50,10 +54,10 @@ def crossover(parent_1, parent_2, helper):
         new_end = last_end
 
         for edge in truck_edges:            
-            e_count += 1
+            #e_count += 1
             if edge not in subroute:
-                if edge in child.path:
-                    print 'repetido'
+                # if edge in child.path:
+                #     print 'repetido'
 
                 # check the capacity here
                 if truck_capacity >= truck_used_capacity + edge[3]['weight']:
@@ -78,11 +82,11 @@ def crossover(parent_1, parent_2, helper):
 
         last_end = new_end
 
-    if e_count != len(parent_1.path):
-        print 'deu merda'
+    # if e_count != len(parent_1.path):
+    #     print 'deu merda'
 
-    if len(child.path) + len(to_new_truck) != len(parent_1.path):
-        print 'deu merda'
+    # if len(child.path) + len(to_new_truck) != len(parent_1.path):
+    #     print 'deu merda'
 
     if len(to_new_truck) > 0:
         served_edges = 0
@@ -105,17 +109,17 @@ def crossover(parent_1, parent_2, helper):
                     break
 
             # here we must check if the truck will join the list of route trucks
-            # if the truck drived at least one edge, add it to the list
+            # if the truck drove at least one edge, add it to the list
             if t_end - t_start > 0:
                 child.trucks_used.append((truck, t_start, t_end, t_fill))
     
-    if len(child.path) != 473:
-        print 'child greater than expected'
+    # if len(child.path) != 473:
+    #     print 'child greater than expected'
 
-    duplicates = [item for item, count in collections.Counter([edge[0:3] for edge in child.path]).items() if count > 1]
-    if len(duplicates) > 0:
-        print 'duplicates found:'
-        print duplicates
+    # duplicates = [item for item, count in collections.Counter([edge[0:3] for edge in child.path]).items() if count > 1]
+    # if len(duplicates) > 0:
+    #     print 'duplicates found:'
+    #     print duplicates
 
     return child
 

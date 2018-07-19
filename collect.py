@@ -98,7 +98,7 @@ def do():
 # ----------------------------------------------------------------------------------
 
 # WHERE AM I ? TE OR HOME
-where_am_i = "HOME"
+where_am_i = "TE"
 
 if where_am_i == "HOME":
     CAMPOLIDE_GRAPH = 'campolide_graph.graphml'
@@ -171,6 +171,12 @@ trucks = [
     ('79-20-XT', 400)
 ]
 
+# SUM of every edge in Campolide
+total_length = 0
+for edge in G.edges(keys=True, data=True):
+    total_length += edge[3]['length']
+print 'total length of Campolide is: ' + str(total_length)
+
 # create a helper
 helper = Helper(G_lisbon, trucks)
 
@@ -186,17 +192,17 @@ if len(duplicates) > 0:
 
 # randomize the initial population
 population = Population(helper, G.edges(keys=True, data=True), trucks, True)
-print 'initial population best fitness: ' + str(population.get_best_fitness(
-).fitness) + ' best fitness paths number: ' + str(len(population.get_best_fitness().path))
+print 'initial population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+    population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
 
 # evolving
-for i in range(500):
+for i in range(100):
     population = population.evolve()
-    print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + \
-        ' best fitness paths number: ' + \
-        str(len(population.get_best_fitness().path))
+    print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+        population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
 
-print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' best fitness paths number: ' + str(len(population.get_best_fitness().path))
+print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+    population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
 
 # # plot the graph
 # print 'plooting'
