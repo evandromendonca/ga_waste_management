@@ -1,7 +1,6 @@
 # encoding: utf-8
 # ----------------------------------------------------------------------------------
-# A genetic algorithm for the Capacitated Arc Rout Problem (CARP) with multiple
-# capacities
+# A genetic algorithm for the Capacitated Arc Rout Problem (CARP) with multiple capacities
 # Case of Campolide
 # Using the new Genetic Representation for the Vehicle Route Problem
 # count the cars by capacity (n importa a placa do carro, e sim a capacidade DISTINCT)
@@ -10,8 +9,8 @@
 # Xml.etree.ElementTree docs: https://docs.python.org/2/library/xml.etree.elementtree.html#elementtree-xpath
 # Shortest path: https://networkx.github.io/documentation/stable/reference/algorithms/shortest_paths.html?highlight=shortest%20path#module-networkx.algorithms.shortest_paths.astar
 # Routing: https://medium.com/@bobhaffner/osmnx-intro-and-routing-1fd744ba23d8
-# https://www.uv.es/belengue/carp.html
 # OpenStreetMaps: https://www.openstreetmap.org/relation/5400890#map=12/38.7441/-9.1581
+# https://www.uv.es/belengue/carp.html
 # ----------------------------------------------------------------------------------
 
 import csv
@@ -27,15 +26,6 @@ from population import Population
 from helper import Helper
 import collections
 
-# available trucks must also be presented
-trucks = [
-    ('95-60-LG', 900),
-    ('05-IG-14', 1400),
-    ('53-MP-23', 500),
-    ('54-SV-71', 600),
-    ('79-20-XT', 400)
-]
-
 # WHERE AM I ? TE OR HOME
 where_am_i = "HOME"
 
@@ -47,6 +37,15 @@ else:
     CAMPOLIDE_GRAPH = 'TE_campolide_graph.graphml'
     LISBON_GRAPH = 'TE_lisbon_graph.graphml'
     EDGES_FILE = 'TE_edges.csv'
+
+# available trucks must also be presented
+trucks = [
+    ('95-60-LG', 900),
+    ('05-IG-14', 1400),
+    ('53-MP-23', 500),
+    ('54-SV-71', 600),
+    ('79-20-XT', 400)
+]
 
 try:
     print 'about to open campolide_graph and lisbon_graph from file'

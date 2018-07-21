@@ -38,6 +38,8 @@ class Population:
             # crossover these chomosomes
             child = ga.crossover(parent_1, parent_2, self.helper)
             
+            child.fitness = None  # reset the fitness (it was calculated in the tournament and yet can mutate)
+
             new_population.chromosomes.append(child)
         
         # mutate
