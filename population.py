@@ -7,7 +7,7 @@ class Population:
         self.chromosomes = []
         self.helper = helper
         self.best_fitness = None
-
+        
         # generate a random population given the edges and trucks
         if randomize == True and edges != None and trucks != None:
             self.chromosomes = ga.randomize_population(edges, trucks)
@@ -25,9 +25,10 @@ class Population:
 
         # the best fitting solution go to the next population automatically (ELITISM)
         best_fit = ga.get_best_fitness(self.chromosomes, self.helper)
+        best_fit.fitness = None # reset the fitness (it can mutate)
         new_population.chromosomes.append(best_fit)
 
-        # for the number of the population do:
+        # crossover
         for _ in range(1, len(self.chromosomes)):
             #print 'generating child ' + str(i)
             # must select parent 1 using TOURNAMENT SELECTION
@@ -36,9 +37,10 @@ class Population:
             parent_2 = ga.tournament_selection(self.chromosomes, self.helper)
             # crossover these chomosomes
             child = ga.crossover(parent_1, parent_2, self.helper)
-            # mutate at a LOW RATE
-            # ga.mutation(child)
-
+            
             new_population.chromosomes.append(child)
+        
+        # mutate
+        ga.mutate(new_population.chromosomes)
 
         return new_population

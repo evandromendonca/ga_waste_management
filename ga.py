@@ -2,9 +2,75 @@ import random
 from chromosome import Chromosome
 import collections
 
+POPULATION_SIZE = 30
+CROSSOVER_RATE = 0.8
+MUTATION_SWAP_RATE = 0.01
+MUTATION_INVERSION_RATE = 0.01
+TOURNAMENT_SIZE = 10
+
+def mutate(chromosomes):
+    for chromosome in chromosomes:            
+        num = random.random()
+        if num < MUTATION_SWAP_RATE:
+            mutation_swap(chromosome)
+
+        num = random.random()
+        if num < MUTATION_INVERSION_RATE:
+            mutation_inverse(chromosome)
+
+def mutation_swap(chromosome):
+    # this can fail, so try the mutation 10 times only
+    for _ in range(10):
+        truck_1 = random.choice(chromosome.trucks_used)
+        index_1 = random.randint(truck_1[1], truck_1[2] - 1)
+        edge_1 = chromosome.path[index_1]
+        truck_1_capacity = truck_1[0][1]
+        truck_1_fill = truck_1[3]
+        edge_1_weight = edge_1[3]['weight']
+
+        truck_2 = random.choice(chromosome.trucks_used)
+        index_2 = random.randint(truck_2[1], truck_2[2] - 1)
+        edge_2 = chromosome.path[index_2]
+        truck_2_capacity = truck_2[0][1]
+        truck_2_fill = truck_2[3]
+        edge_2_weight = edge_2[3]['weight']
+        
+        if truck_1_fill - edge_1_weight + edge_2_weight <= truck_1_capacity and truck_2_fill - edge_2_weight + edge_1_weight <= truck_2_capacity:
+            chromosome.path[index_1] = edge_2
+            chromosome.path[index_2] = edge_1
+            break
+
+
+def mutation_inverse(chromosome):
+    # select a truck from the chromosome
+    truck_route = random.choice(chromosome.trucks_used)
+    truck_ini = truck_route[1]
+    truck_end = truck_route[2]
+
+    # select a subroute from the chosen truck_route
+    subroute_ini = random.randint(truck_ini, truck_end - 1)
+    subroute_end = random.randint(subroute_ini, truck_end - 1)
+    subroute_end += 1
+
+    subroute = chromosome.path[subroute_ini:subroute_end]    
+
+    i = subroute_ini
+    for edge in reversed(subroute):
+        chromosome.path[i] = edge
+        i += 1
+
 # this is to check the performance using line_profiler @ https://github.com/rkern/line_profiler
 #@profile 
 def crossover(parent_1, parent_2, helper):
+    num = random.random()
+    if num > CROSSOVER_RATE:
+        # since this crossover generates only one child, and the genetic material
+        # is not shared between the two parents, I'm choosing to pass the one that
+        # is being used to insert the genetic material from the other, so more of him would
+        # be passed anyway
+        return parent_1 
+    
+
     # select a truck from the parent 2
     truck_route = random.choice(parent_2.trucks_used)
     truck_ini = truck_route[1]
@@ -121,11 +187,7 @@ def crossover(parent_1, parent_2, helper):
     #     print 'duplicates found:'
     #     print duplicates
 
-    return child
-
-
-# def mutation(chromosome):
-#     print 'mutation must take place here'
+    return child    
 
 
 def tournament_selection(chromosomes, helper):
@@ -134,7 +196,7 @@ def tournament_selection(chromosomes, helper):
         return None
 
     # choosing an indivial in the population based on a tournament
-    selected_chromosomes = random.sample(chromosomes, 5)
+    selected_chromosomes = random.sample(chromosomes, TOURNAMENT_SIZE)
 
     if len(selected_chromosomes) <= 0:
         print 'No chromosome selected for the sample at the tournament'
@@ -168,7 +230,7 @@ def randomize_population(edges, trucks):
     chromosomes = []
 
     # generate random routes combinations
-    for _ in range(10):
+    for _ in range(POPULATION_SIZE):
         # create a chromosome
         cr = Chromosome()
 
