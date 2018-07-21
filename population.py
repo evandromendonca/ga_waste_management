@@ -26,6 +26,7 @@ class Population:
         # the best fitting solution go to the next population automatically (ELITISM)
         best_fit = ga.get_best_fitness(self.chromosomes, self.helper)
         best_fit.fitness = None # reset the fitness (it can mutate)
+        
         new_population.chromosomes.append(best_fit)
 
         # crossover
