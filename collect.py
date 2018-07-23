@@ -11,6 +11,10 @@
 # Routing: https://medium.com/@bobhaffner/osmnx-intro-and-routing-1fd744ba23d8
 # OpenStreetMaps: https://www.openstreetmap.org/relation/5400890#map=12/38.7441/-9.1581
 # https://www.uv.es/belengue/carp.html
+#
+# Depósito de embalagens, é uma rua com mão dupla, ver qual é mais perto e atribuir ao fim da rota
+# (268440195, 268440181, 0)
+# (268440181, 268440195, 0)
 # ----------------------------------------------------------------------------------
 
 import csv
