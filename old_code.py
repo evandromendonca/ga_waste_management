@@ -87,3 +87,19 @@ def do():
 # print route
 # print 'length: ' + str(length)
 # print 'garbage collected: ' + str(garbage_collected)
+
+
+
+
+
+# CALC THE DISTANCE FROM EVERY EDGE OF CAMPOLIDE TO THE DEPOSIT:
+#   (268440195, 268440181, 0)
+# distances = []
+# depot_distance = G_lisbon.edges[(268440195, 268440181, 0)]['length']
+# for edge in G.edges(keys=True, data=True):
+#     distance_edge_from = edge[3]['length']
+#     last_node_edge_from = edge[1]
+#     first_node_edge_to = 268440195
+#     distance_between_edges = nx.shortest_path_length(G_lisbon, last_node_edge_from, first_node_edge_to, weight='length')
+#     total_distance = distance_edge_from + distance_between_edges + depot_distance
+#     distances.append(str(tuple(edge[0:3])) + ';(268440195, 268440181, 0)|' + str(total_distance))

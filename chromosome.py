@@ -31,9 +31,21 @@ class Chromosome:
         fitness = 0
         for truck in self.trucks_used:
             edges = self.path[truck[1]:truck[2]]
-            fitness += helper.calc_distance(edges)
-            # add 5km for each truck (departure and return to the base)
-            fitness += 5000
+            fitness += helper.calc_distance(edges)            
+            # sum the distance between the last node and the deposit
+            distance_last_edge_deposit = helper.calc_distance([edges[-1], (268440195, 268440181, 0)])
+            # remove the distance of the last edge from the distance to deposit
+            distance_last_edge_deposit = distance_last_edge_deposit - helper.calc_distance([edges[-1]])
+            fitness += distance_last_edge_deposit
+
+            # sum distance between departure site and the first node
+            distance_deposit_first_edge = helper.calc_distance([(268440195, 268440181, 0), edges[0]])
+            # remove the distance of the first edge from the distance to deposit
+            distance_deposit_first_edge = distance_deposit_first_edge - helper.calc_distance([edges[0]])
+            fitness += distance_deposit_first_edge
+
+            #print 'distance from deposit=' + str(distance_deposit_first_edge)
+            #print 'distance to deposit=' + str(distance_last_edge_deposit)
 
         self.fitness = fitness
         return self.fitness

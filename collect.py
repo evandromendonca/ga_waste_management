@@ -99,6 +99,18 @@ print 'We have (' + str(G.number_of_nodes()) + \
 # City data plot with removed highways
 # ox.plot_graph(G)
 
+# # CALC THE DISTANCE FROM EVERY EDGE OF CAMPOLIDE TO THE DEPOSIT:
+# #   (268440195, 268440181, 0)
+# distances = '(268440195, 268440181, 0)'
+# depot_distance = G_lisbon.edges[(268440195, 268440181, 0)]['length']
+# for edge in G.edges(keys=True, data=True):
+#     distance_edge_to = edge[3]['length']
+#     last_node_edge_from = 268440181
+#     first_node_edge_to = edge[0]
+#     distance_between_edges = nx.shortest_path_length(G_lisbon, last_node_edge_from, first_node_edge_to, weight='length')
+#     total_distance = depot_distance + distance_between_edges + distance_edge_to
+#     distances += ';' + str(tuple(edge[0:3])) + '|' + str(total_distance)
+
 # Must attribute a weight of garbage to each edge
 for edge in G.edges:
     G.edges[edge]['weight'] = random.randint(1, 100)
@@ -129,7 +141,7 @@ print 'initial population best fitness: ' + str(population.get_best_fitness().fi
     population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
 
 # evolving
-for i in range(300):
+for i in range(1000):
     population = population.evolve()
     print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
         population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
