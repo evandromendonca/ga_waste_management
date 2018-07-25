@@ -12,9 +12,7 @@
 # OpenStreetMaps: https://www.openstreetmap.org/relation/5400890#map=12/38.7441/-9.1581
 # https://www.uv.es/belengue/carp.html
 #
-# Depósito de embalagens, é uma rua com mão dupla, ver qual é mais perto e atribuir ao fim da rota
-# (268440195, 268440181, 0)
-# (268440181, 268440195, 0)
+# Depósito de embalagens, é uma rua com mão dupla, usar essa edge: (268440195, 268440181, 0)
 # ----------------------------------------------------------------------------------
 
 import csv
@@ -36,11 +34,11 @@ where_am_i = "HOME"
 if where_am_i == "HOME":
     CAMPOLIDE_GRAPH = 'campolide_graph.graphml'
     LISBON_GRAPH = 'lisbon_graph.graphml'
-    EDGES_FILE = 'edges.csv'
+    EDGES_FILE = './data/edges.csv'
 else:
     CAMPOLIDE_GRAPH = 'TE_campolide_graph.graphml'
     LISBON_GRAPH = 'TE_lisbon_graph.graphml'
-    EDGES_FILE = 'TE_edges.csv'
+    EDGES_FILE = './data/TE_edges.csv'
 
 # available trucks must also be presented
 trucks = [
