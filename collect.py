@@ -94,11 +94,11 @@ G.remove_nodes_from(list(nx.isolates(G)))
 print 'We have (' + str(G.number_of_nodes()) + \
     ') nodes and (' + str(G.number_of_edges()) + ') edges'
 
-# plot the graph
-print 'plooting'
-plt.subplot(111)
-nx.draw(G, with_labels=False, font_weight='normal', node_size=10)
-plt.show()
+# # plot the graph
+# print 'plooting'
+# plt.subplot(111)
+# nx.draw(G, with_labels=False, font_weight='normal', node_size=10)
+# plt.show()
 
 # City data plot with removed highways
 # ox.plot_graph(G)
