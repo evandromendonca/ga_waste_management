@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 import random
 from chromosome import Chromosome
 import collections
@@ -228,6 +230,30 @@ def get_best_fitness(chromosomes, helper):
 
 def randomize_population(edges, trucks):
     chromosomes = []
+
+    #edges list removing twoways
+    el = list(edges) # lista de todas as edges
+    all_edges = list(filter(lambda way: way[3]['oneway'] == True, el)) # edges que tem apenas um lado
+    two_way_edges = list(filter(lambda way: way[3]['oneway'] == False, el)) # edges que tem dois lados
+    match_two_way_edges = [] # edges de dois lados com sua match
+
+    for edge in two_way_edges: # para cada edge de dois lados
+        
+        # acha a edge que sao exatamente o oposto da edge estudada    
+        opposites = list(filter(lambda way: way[0] == edge[1] and way[1] == edge[0] and way[3]['length'] == edge[3]['length'], two_way_edges))
+        
+        if (len(opposites) != 1): # se achou mais de um oposto, algum erro tem
+            print 'some error with this edge ' + str(edge[0:3])
+
+        if (opposites[0] in all_edges or edge in all_edges): # se a edge ja esta na lista de todas as edges, nao verifica
+            continue
+
+        match_two_way_edges.append((edge[0:3], opposites[0][0:3]))
+
+        # aqui podemos inserir tanto a edge como o oposto encontrado
+        # o que deve ser entendido é que a escolha entre elas deve ser random depois, pois representam a mesma rua
+        #all_edges.append(opposites[0])
+        all_edges.append(edge)
 
     # generate random routes combinations
     for _ in range(POPULATION_SIZE):
