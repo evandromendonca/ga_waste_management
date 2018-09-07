@@ -96,6 +96,9 @@ def crossover(parent_1, parent_2, helper):
     #if len(subroute) <= 0:
     #    print 'deu merda'
 
+    # A CLOSEST EDGE BEFORE PRECISA ESTAR NO PATH, ENTAO SE VIER UMA EDGE QUE NAO ESTEJA,
+    # COM CERTEZA EXISTE UMA CORRESPONDENTE QUE ESTÁ. BASTA BUSCAR ESSA CORRESPONDENTE
+
     closest_before_subroute = helper.closest_edge_before(subroute)
 
     # c = False
@@ -121,9 +124,11 @@ def crossover(parent_1, parent_2, helper):
         new_start = last_end
         new_end = last_end
 
+        # NO CROSSOVER PRECISO VERIFICAR SE AS EDGES, OU SUAS CORRESPONDENTES, NAO ESTAO NA SUBROUTE
+        
         for edge in truck_edges:            
             #e_count += 1
-            if edge not in subroute:
+            if edge not in subroute: 
                 # if edge in child.path:
                 #     print 'repetido'
 
