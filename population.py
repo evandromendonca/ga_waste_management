@@ -10,7 +10,7 @@ class Population:
         
         # generate a random population given the edges and trucks
         if randomize == True and edges != None and trucks != None:
-            self.chromosomes = ga.randomize_population(edges, trucks)
+            self.chromosomes = ga.randomize_population(edges, trucks, self.helper.corresponding_edges)
 
     def get_best_fitness(self):
         if self.best_fitness == None:

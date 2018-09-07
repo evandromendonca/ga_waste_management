@@ -127,7 +127,7 @@ for edge in G.edges(keys=True, data=True):
 print 'total length of Campolide is: ' + str(total_length)
 
 # create a helper
-helper = Helper(G_lisbon, trucks)
+helper = Helper(G_lisbon, trucks, list(G.edges(keys=True, data=True)))
 
 # calculate each campolide edge distance
 #distance_map = helper.build_distance_map(G.edges, EDGES_FILE)

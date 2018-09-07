@@ -3,10 +3,36 @@ import networkx as nx
 
 
 class Helper:
-    def __init__(self, graph, trucks):
+    def __init__(self, graph, trucks, edges_to_correspond):
         self.G = graph
         self.distance_map = None
         self.all_trucks = trucks
+
+        self.corresponding_edges = {}
+
+        # edges list removing two-ways
+        el = list(edges_to_correspond) # lista de todas as edges
+        #all_edges = list(filter(lambda way: way[3]['oneway'] == True, el)) # edges que tem apenas um lado
+        two_way_edges = list(filter(lambda way: way[3]['oneway'] == False, el)) # edges que tem dois lados
+        #match_two_way_edges = [] # edges de dois lados com sua match
+
+        for edge in two_way_edges: # para cada edge de dois lados     
+            # acha a edge que sao exatamente o oposto da edge estudada    
+            opposites = list(filter(lambda way: way[0] == edge[1] and way[1] == edge[0] and way[3]['length'] == edge[3]['length'], two_way_edges))
+            if (len(opposites) != 1): # se achou mais de um oposto, algum erro tem
+                print 'some error with this edge ' + str(edge[0:3])
+            #if (opposites[0] in all_edges or edge in all_edges): # se a edge ja esta na lista de todas as edges, nao verifica
+            #    continue
+            if (edge[0:3] in self.corresponding_edges):
+                continue
+
+            self.corresponding_edges[edge[0:3]] = opposites[0][0:3]
+            self.corresponding_edges[opposites[0][0:3]] = edge[0:3]
+            #self.corresponding_edges.append((edge[0:3], opposites[0][0:3]))
+            # aqui podemos inserir tanto a edge como o oposto encontrado
+            #all_edges.append(opposites[0])
+            #all_edges.append(edge)
+
 
     def parse_tuple(self, string):
         try:
