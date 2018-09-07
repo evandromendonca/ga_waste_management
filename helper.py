@@ -26,8 +26,8 @@ class Helper:
             if (edge[0:3] in self.corresponding_edges):
                 continue
 
-            self.corresponding_edges[edge[0:3]] = opposites[0][0:3]
-            self.corresponding_edges[opposites[0][0:3]] = edge[0:3]
+            self.corresponding_edges[edge[0:3]] = opposites[0]
+            self.corresponding_edges[opposites[0][0:3]] = edge
             #self.corresponding_edges.append((edge[0:3], opposites[0][0:3]))
             # aqui podemos inserir tanto a edge como o oposto encontrado
             #all_edges.append(opposites[0])
@@ -220,7 +220,11 @@ class Helper:
         closest_distance = None
         edges_list = [edge[0:3] for edge in edges]
         for previous_edge in self.distance_map:
+            # check if the edge is in the edge list, so it can be the closest before it
             if previous_edge in edges_list:
+                continue
+            # check if the corresponding edge is in the list, because corresponding edges are served only once per path
+            if previous_edge in self.corresponding_edges and self.corresponding_edges[previous_edge][0:3] in edges_list:
                 continue
             if edges_list[0] in self.distance_map[previous_edge]:
                 if closest_distance == None or closest_distance > self.distance_map[previous_edge][edges_list[0]]:

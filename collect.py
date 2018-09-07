@@ -145,7 +145,7 @@ print 'initial population best fitness: ' + str(population.get_best_fitness().fi
     population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
 
 # evolving
-for i in range(1000):
+for i in range(10000):
     population = population.evolve()
     print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
         population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
