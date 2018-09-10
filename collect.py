@@ -16,7 +16,6 @@
 # ----------------------------------------------------------------------------------
 
 import csv
-from collection_data import collection_data
 from datetime import datetime
 import xml.etree.ElementTree as ET
 import osmnx as ox
@@ -27,6 +26,9 @@ import ga
 from population import Population
 from helper import Helper
 import collections
+
+# Media de lixo por metro em base nas duas rotas E0504 e E0714 Int = 0.21757637738 kg (vide data_filter.py)
+residuo_metro = 0.21757637738
 
 # WHERE AM I ? TE OR HOME
 where_am_i = "HOME"
@@ -117,14 +119,17 @@ print 'We have (' + str(G.number_of_nodes()) + \
 
 # Must attribute a weight of garbage to each edge
 for edge in G.edges:
-    G.edges[edge]['weight'] = random.randint(1, 100)
+    G.edges[edge]['weight'] = residuo_metro * G.edges[edge]['length']
     #G_lisbon.edges[edge]['weight'] = random.randint(1, 100)
 
 # SUM of every edge in Campolide
 total_length = 0
+total_weight = 0
 for edge in G.edges(keys=True, data=True):
     total_length += edge[3]['length']
+    total_weight += edge[3]['weight']
 print 'total length of Campolide is: ' + str(total_length)
+print 'total weight of Campolide is: ' + str(total_weight)
 
 # create a helper
 helper = Helper(G_lisbon, trucks, list(G.edges(keys=True, data=True)))

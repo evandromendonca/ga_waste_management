@@ -6,6 +6,7 @@ from itertools import groupby
 from difflib import SequenceMatcher
 from collection_data import collection_data
 from route_detail import route_detail
+from truck import truck
 
 
 # O arquivo de coleta tem dados de 01/11/2017 até 30/04/2018
@@ -53,6 +54,8 @@ def read_routes_details():
     return route_details
 
 
+
+
 all_collection_data = read_collection_data() # list of objects of the collection data from Camara de Lisboa
 campolide_routes = read_campolide_routes_file() # list with the route codes for campolide
 routes_details = read_routes_details() # list of objects with route details for campolide
@@ -63,7 +66,7 @@ for data in all_collection_data:
     if data.route in campolide_routes and data.group == 'Embalagens' and \
         (data.route_type == 'Remoção-Selectiva-PaP-Troço'):
         if data.truck_plate not in trucks_campolide:
-            trucks_campolide[data.truck_plate] = (data.truck_plate, data.truck_capacity, data.truck_type)
+            trucks_campolide[data.truck_plate] = truck(data.truck_plate, data.truck_type)
         campolide_collection_data_embalagens.append(data)
 
 rota_E0714_Int = filter(lambda x: x.route == 'E0714 Int', campolide_collection_data_embalagens)
@@ -105,9 +108,22 @@ print 'ROUTE E0504 -> Total ruas: ' + str(num_ruas_em_total_E0504) + ' Em campol
 percentual_ruas_rota_E0504_campolide = num_ruas_em_campolide_E0504 / float(num_ruas_em_total_E0504)
 print 'ROUTE E0504 -> Percentual da rota em Campolide: ' + str(percentual_ruas_rota_E0504_campolide)
 
-print 'ROUTE E0504 -> total coletado na parte de campolide: ' + str(media_rota_E0504 * percentual_ruas_rota_E0504_campolide)
 print 'Route E0714 Int -> total coletado na parte de campolide: ' + str(media_rota_E0714_Int * percentual_ruas_rota_E0714_Int_campolide)
+print 'ROUTE E0504 -> total coletado na parte de campolide: ' + str(media_rota_E0504 * percentual_ruas_rota_E0504_campolide)
 
+
+tamanho_rota_E0714_Int_em_campolide = 1357
+print 'Route E0714 Int -> Tamanho rota em metros: ' + str(tamanho_rota_E0714_Int_em_campolide)
+
+tamanho_rota_E0504_em_campolide = 890
+print 'Route E0504 -> Tamanho rota em metros: ' + str(tamanho_rota_E0504_em_campolide)
+
+lixo_por_metro_E0714_Int = (media_rota_E0714_Int * percentual_ruas_rota_E0714_Int_campolide) / float(tamanho_rota_E0714_Int_em_campolide)
+lixo_por_metro_E0504 = (media_rota_E0504 * percentual_ruas_rota_E0504_campolide) / float(tamanho_rota_E0504_em_campolide)
+print 'Route E0714 Int -> Lixo recolhido por metro = ' + str(lixo_por_metro_E0714_Int)
+print 'Route E0504 -> Lixo recolhido por metro = ' + str(lixo_por_metro_E0504)
+
+print 'Media de lixo por metro em base nas duas rotas = ' + str((lixo_por_metro_E0504 + lixo_por_metro_E0714_Int) / float(2)) 
 
 # para todos os dados de coleta disponibilizados pela Camara de Lisboa, vou usar apenas os que a rota passa por Campolide e que sejam
 # coleta porta a porta seletiva
