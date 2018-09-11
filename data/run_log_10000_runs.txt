@@ -1,0 +1,128 @@
+about to open campolide_graph and lisbon_graph from file
+opened the campolide_graph and lisbon_graph from file
+We have (360) nodes and (725) edges
+only let residential and secondary nodes at Campolide graph
+We have (274) nodes and (473) edges after removal
+total length of Campolide is: 24753.256
+total weight of Campolide is: 5385.72376884
+calculating the closest before each edge
+
+starting new round...
+initial population best fitness: 530347.632 with 5 trucks and with paths number: 309
+final population best fitness: 106535.807 with 4 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 519061.655 with 5 trucks and with paths number: 309
+final population best fitness: 124609.702 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 526269.217 with 6 trucks and with paths number: 309
+final population best fitness: 140187.93 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 530492.826 with 5 trucks and with paths number: 309
+final population best fitness: 121339.607 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 520770.877 with 5 trucks and with paths number: 309
+final population best fitness: 118066.31 with 4 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 532965.209 with 5 trucks and with paths number: 309
+final population best fitness: 108331.007 with 4 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 531115.622 with 5 trucks and with paths number: 309
+final population best fitness: 117839.002 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 525560.946 with 6 trucks and with paths number: 309
+final population best fitness: 125650.168 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 517066.423 with 5 trucks and with paths number: 309
+final population best fitness: 105928.001 with 4 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 526786.339 with 5 trucks and with paths number: 309
+final population best fitness: 141139.59 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 537124.653 with 6 trucks and with paths number: 309
+final population best fitness: 125695.633 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 522650.161 with 5 trucks and with paths number: 309
+final population best fitness: 120547.61 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 527650.944 with 5 trucks and with paths number: 309
+final population best fitness: 126867.594 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 525543.248 with 5 trucks and with paths number: 309
+final population best fitness: 117710.844 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 532271.163 with 5 trucks and with paths number: 309
+final population best fitness: 108694.342 with 4 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 527719.909 with 5 trucks and with paths number: 309
+final population best fitness: 116280.889 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 526678.354 with 5 trucks and with paths number: 309
+final population best fitness: 121275.986 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 525098.307 with 5 trucks and with paths number: 309
+final population best fitness: 117840.572 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 523039.217 with 5 trucks and with paths number: 309
+final population best fitness: 124007.55 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 526006.632 with 5 trucks and with paths number: 309
+final population best fitness: 124738.124 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 505295.774 with 5 trucks and with paths number: 309
+final population best fitness: 119709.797 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 532720.81 with 6 trucks and with paths number: 309
+final population best fitness: 117626.333 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 526052.915 with 5 trucks and with paths number: 309
+final population best fitness: 126998.203 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 517619.785 with 5 trucks and with paths number: 309
+final population best fitness: 126466.255 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 528966.662 with 5 trucks and with paths number: 309
+final population best fitness: 127362.539 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 526253.623 with 6 trucks and with paths number: 309
+final population best fitness: 118290.51 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 510778.043 with 5 trucks and with paths number: 309
+final population best fitness: 120748.417 with 5 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 524610.024 with 6 trucks and with paths number: 309
+final population best fitness: 132742.736 with 6 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 536965.885 with 6 trucks and with paths number: 309
+final population best fitness: 132084.929 with 6 trucks and with paths number: 309
+
+starting new round...
+initial population best fitness: 523345.759 with 5 trucks and with paths number: 309
+final population best fitness: 109115.913 with 4 trucks and with paths number: 309
