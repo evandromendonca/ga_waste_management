@@ -17,9 +17,8 @@ class Population:
             self.best_fitness = ga.get_best_fitness(self.chromosomes, self.helper)
         return self.best_fitness
 
+    #@profile 
     def evolve(self):
-        print 'evolving the population'
-
         # create a new population
         new_population = Population(self.helper)
 

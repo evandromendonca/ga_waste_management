@@ -1,9 +1,6 @@
 import random
 
-# http://osof.org/wp-content/uploads/2016/03/OSOF-Waste-Conversion-Table.pdf
-plastic_kg_per_cubic_meter = 130
 deposit = (268440195, 268440181, 0)
-
 
 class Chromosome:
     def __init__(self):

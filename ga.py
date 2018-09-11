@@ -4,7 +4,7 @@ import random
 from chromosome import Chromosome
 import collections
 
-POPULATION_SIZE = 30
+POPULATION_SIZE = 100
 CROSSOVER_RATE = 0.8
 MUTATION_SWAP_RATE = 0.01
 MUTATION_INVERSION_RATE = 0.01
@@ -72,7 +72,6 @@ def crossover(parent_1, parent_2, helper):
         # be passed anyway
         return parent_1 
     
-
     # select a truck from the parent 2
     truck_route = random.choice(parent_2.trucks_used)
     truck_ini = truck_route[1]
@@ -84,32 +83,26 @@ def crossover(parent_1, parent_2, helper):
     subroute_end += 1
 
     subroute = parent_2.path[subroute_ini:subroute_end]
+    subroute_set = set(edge[0:3] for edge in subroute)
     
     # Must get the subroute weight
     subroute_weight = 0  
     for edge in subroute:
         subroute_weight += edge[3]['weight']
 
-    # teste
-    if len(subroute) <= 0:
-        print 'A subrota para crossover não tem nenhum elemento'
+    # # teste
+    # if len(subroute) <= 0:
+    #     print 'A subrota para crossover não tem nenhum elemento'
 
-    closest_before_subroute = helper.closest_edge_before(subroute)
+    closest_before_subroute = helper.closest_edge_before(subroute, parent_1.path)
 
     # A CLOSEST EDGE BEFORE PRECISA ESTAR NO PARENT 1 PATH, ENTAO SE VIER UMA EDGE QUE NAO ESTEJA,
     # COM CERTEZA EXISTE UMA CORRESPONDENTE QUE ESTÁ. BASTA BUSCAR ESSA CORRESPONDENTE
-    in_path = filter(lambda x: x[0:3] == closest_before_subroute, parent_1.path)
-    if (len(in_path) > 1):
-        print 'merda aqui'
-    if (len(in_path) == 0):
-        closest_before_subroute = helper.corresponding_edges[closest_before_subroute][0:3]
-
-    # c = False
-    # for edge in parent_1.path:
-    #     if edge[0:3] == closest_before_subroute:
-    #         c = True
-    # if c == False:
-    #     print 'deu merda'
+    # in_path = filter(lambda x: x[0:3] == closest_before_subroute, parent_1.path)
+    # if (len(in_path) > 1):
+    #     print 'merda aqui'
+    # if (len(in_path) == 0):
+    #     closest_before_subroute = helper.corresponding_edges[closest_before_subroute][0:3]
 
     # now create a child inserting the subroute created in the parent_1
     child = Chromosome()
@@ -126,32 +119,35 @@ def crossover(parent_1, parent_2, helper):
         new_end = last_end
 
         
-        for edge in truck_edges:            
-            #e_count += 1
+        for edge in truck_edges:
+            edge_abv = edge[0:3]
 
             # NO CROSSOVER PRECISO VERIFICAR SE AS EDGES, OU SUAS CORRESPONDENTES, NAO ESTAO NA SUBROUTE
-            if edge not in subroute and (edge[0:3] not in helper.corresponding_edges or helper.corresponding_edges[edge[0:3]] not in subroute): 
+            if edge_abv in subroute_set or \
+                (edge_abv in helper.corresponding_edges and \
+                helper.corresponding_edges[edge_abv][0:3] in subroute_set):
+                continue
                 
-                # teste
-                if edge in child.path:
-                    print 'repetido'
+            # # teste
+            # if edge in child.path:
+            #     print 'repetido'
 
+            # check the capacity here
+            if truck_capacity >= truck_used_capacity + edge[3]['weight']:
+                new_end += 1
+                truck_used_capacity += edge[3]['weight']
+                child.path.append(edge)
+            else:
+                to_new_truck.append(edge)
+
+            if edge_abv == closest_before_subroute:
                 # check the capacity here
-                if truck_capacity >= truck_used_capacity + edge[3]['weight']:
-                    new_end += 1
-                    truck_used_capacity += edge[3]['weight']
-                    child.path.append(edge)
+                if truck_capacity >= truck_used_capacity + subroute_weight:
+                    new_end += len(subroute)
+                    truck_used_capacity += subroute_weight
+                    child.path.extend(subroute)
                 else:
-                    to_new_truck.append(edge)
-
-                if edge[0:3] == closest_before_subroute:
-                    # check the capacity here
-                    if truck_capacity >= truck_used_capacity + subroute_weight:
-                        new_end += len(subroute)
-                        truck_used_capacity += subroute_weight
-                        child.path.extend(subroute)
-                    else:
-                        to_new_truck.extend(subroute)
+                    to_new_truck.extend(subroute)
 
         if new_end - new_start > 0: 
             child.trucks_used.append(
@@ -185,15 +181,15 @@ def crossover(parent_1, parent_2, helper):
             if t_end - t_start > 0:
                 child.trucks_used.append((truck, t_start, t_end, t_fill))
 
-    # teste
-    duplicates = [item for item, count in collections.Counter([edge[0:3] for edge in child.path]).items() if count > 1]
-    if len(duplicates) > 0:
-        print 'duplicates found:'
-        print duplicates
+    # # teste
+    # duplicates = [item for item, count in collections.Counter([edge[0:3] for edge in child.path]).items() if count > 1]
+    # if len(duplicates) > 0:
+    #     print 'duplicates found:'
+    #     print duplicates
 
-    # teste
-    if (len(child.path) != len(parent_1.path) or len(child.path) != len(parent_2.path)):
-        print 'Tamanho filho é diferente do que algum dos pais'
+    # # teste
+    # if (len(child.path) != len(parent_1.path) or len(child.path) != len(parent_2.path)):
+    #     print 'Tamanho filho é diferente do que algum dos pais'
 
     return child    
 
@@ -253,8 +249,8 @@ def randomize_population(edges, trucks, corresponding_edges):
             if (edge[0:3] in removed_edges):
                 continue
             if (edge[0:3] in corresponding_edges):
-                edge_to_remove = corresponding_edges[edge[0:3]] #filter(lambda x: x[0:3] == corresponding_edges[edge[0:3]], cr.path)
-                removed_edges.append(edge_to_remove[0:3]) # edge_to_remove[0][0:3])
+                edge_to_remove = corresponding_edges[edge[0:3]]
+                removed_edges.append(edge_to_remove[0:3])
                 cr.path.remove(edge_to_remove)
 
         # to keep the trucks that were already chosen by the algorithm

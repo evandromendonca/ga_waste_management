@@ -11,6 +11,7 @@
 # Routing: https://medium.com/@bobhaffner/osmnx-intro-and-routing-1fd744ba23d8
 # OpenStreetMaps: https://www.openstreetmap.org/relation/5400890#map=12/38.7441/-9.1581
 # https://www.uv.es/belengue/carp.html
+# Garbage m3 to kg converter: http://osof.org/wp-content/uploads/2016/03/OSOF-Waste-Conversion-Table.pdf
 #
 # Depósito de embalagens, é uma rua com mão dupla, usar essa edge: (268440195, 268440181, 0)
 # ----------------------------------------------------------------------------------
@@ -43,12 +44,18 @@ else:
     EDGES_FILE = './data/TE_edges.csv'
 
 # available trucks must also be presented
+# in the 'trucks_available.csv' file there are 53 trucks with 3 different capacities
+# as the different truck capacity matter, in this example is used one truck of each capacity
+# 80% of the full capacity of the truck is used to give space to error
+# To see how these trucks were generated refer to data_filter.py
+# Plate	    Cap	Cap_KG
+# 31-61-UI	14	1820
+# 02-TZ-69	9	1170
+# 87-CE-84	7	910
 trucks = [
-    ('95-60-LG', 900),
-    ('05-IG-14', 1400),
-    ('53-MP-23', 500),
-    ('54-SV-71', 600),
-    ('79-20-XT', 400)
+    ('31-61-UI', 1456),
+    ('02-TZ-69', 936),
+    ('87-CE-84', 728)
 ]
 
 try:
@@ -73,8 +80,7 @@ except:
     ox.save_graphml(G_projected_lisbon, filename=LISBON_GRAPH)
     print 'done saving in the disk'
 
-print 'We have (' + str(G.number_of_nodes()) + \
-    ') nodes and (' + str(G.number_of_edges()) + ') edges'
+print 'We have (' + str(G.number_of_nodes()) + ') nodes and (' + str(G.number_of_edges()) + ') edges'
 
 # Full city data plot
 # ox.plot_graph(G)
@@ -86,15 +92,12 @@ for edge in G.edges:
     if (G.edges[edge]['highway'] != 'residential' and G.edges[edge]['highway'] != 'secondary'):
         edges_to_remove.append(edge)
 
-# Remove the kept edges
+# Remove the kept edges and nodes without edges after that
 for edge in edges_to_remove:
     G.remove_edge(edge[0], edge[1], edge[2])
-
-# Remove nodes without edges
 G.remove_nodes_from(list(nx.isolates(G)))
 
-print 'We have (' + str(G.number_of_nodes()) + \
-    ') nodes and (' + str(G.number_of_edges()) + ') edges'
+print 'We have (' + str(G.number_of_nodes()) + ') nodes and (' + str(G.number_of_edges()) + ') edges after removal'
 
 # # plot the graph
 # print 'plooting'
@@ -105,34 +108,27 @@ print 'We have (' + str(G.number_of_nodes()) + \
 # City data plot with removed highways
 # ox.plot_graph(G)
 
-# # CALC THE DISTANCE FROM EVERY EDGE OF CAMPOLIDE TO THE DEPOSIT:
-# #   (268440195, 268440181, 0)
-# distances = '(268440195, 268440181, 0)'
-# depot_distance = G_lisbon.edges[(268440195, 268440181, 0)]['length']
-# for edge in G.edges(keys=True, data=True):
-#     distance_edge_to = edge[3]['length']
-#     last_node_edge_from = 268440181
-#     first_node_edge_to = edge[0]
-#     distance_between_edges = nx.shortest_path_length(G_lisbon, last_node_edge_from, first_node_edge_to, weight='length')
-#     total_distance = depot_distance + distance_between_edges + distance_edge_to
-#     distances += ';' + str(tuple(edge[0:3])) + '|' + str(total_distance)
-
 # Must attribute a weight of garbage to each edge
 for edge in G.edges:
     G.edges[edge]['weight'] = residuo_metro * G.edges[edge]['length']
-    #G_lisbon.edges[edge]['weight'] = random.randint(1, 100)
+
+# create a helper
+helper = Helper(G_lisbon, trucks, list(G.edges(keys=True, data=True)))
 
 # SUM of every edge in Campolide
 total_length = 0
 total_weight = 0
+cor_seen_edges = []
 for edge in G.edges(keys=True, data=True):
+    if edge[0:3] in cor_seen_edges:
+        continue
+    if edge[0:3] in helper.corresponding_edges:
+        cor_seen_edges.append(helper.corresponding_edges[edge[0:3]][0:3])
     total_length += edge[3]['length']
     total_weight += edge[3]['weight']
 print 'total length of Campolide is: ' + str(total_length)
 print 'total weight of Campolide is: ' + str(total_weight)
 
-# create a helper
-helper = Helper(G_lisbon, trucks, list(G.edges(keys=True, data=True)))
 
 # calculate each campolide edge distance
 #distance_map = helper.build_distance_map(G.edges, EDGES_FILE)
@@ -144,16 +140,35 @@ if len(duplicates) > 0:
     print 'duplicates in chromosome'
     print duplicates
 
-# randomize the initial population
-population = Population(helper, G.edges(keys=True, data=True), trucks, True)
-print 'initial population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
-    population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+run_fitness_array = []
 
-# evolving
-for i in range(10000):
-    population = population.evolve()
-    print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
-        population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+# Run the tests 30 times with 10.000 iterations and store in the best_fitness_array
+# POPULATION_SIZE = 100
+# CROSSOVER_RATE = 0.8
+# MUTATION_SWAP_RATE = 0.01
+# MUTATION_INVERSION_RATE = 0.01
+# TOURNAMENT_SIZE = 10
 
-print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
-    population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+with open('./data/best_fitness_10000_runs.csv', 'w') as fitness_file:
+    for n in range(30):
+        line = '' # line to save on file
+        
+        print '\nstarting new round...'
+        # randomize the initial population
+        population = Population(helper, G.edges(keys=True, data=True), trucks, True)
+        print 'initial population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+            population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+
+        fit_array = []
+        for i in range(10000): # evolving
+            population = population.evolve()
+            print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+                population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+            
+            line += str(population.get_best_fitness().fitness) + ';' # increase the line to save
+        
+        line += '\n' # jump line
+        fitness_file.write(line) # write on file
+
+# print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+#     population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))

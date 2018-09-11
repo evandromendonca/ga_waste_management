@@ -5,6 +5,7 @@ class truck:
         self.plate = plate
         self.capacity_desc = capacity
         self.capacity = self.capacity_desc_to_m3(self.capacity_desc)
+        self.capacity_kg = self.capacity * 130
     
     def capacity_desc_to_m3(self, cap_text):
         if cap_text == 'Remoção 14/16 m3':

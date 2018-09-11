@@ -69,6 +69,15 @@ for data in all_collection_data:
             trucks_campolide[data.truck_plate] = truck(data.truck_plate, data.truck_type)
         campolide_collection_data_embalagens.append(data)
 
+# with open('./data/trucks_available.csv', 'w') as trucks_file:
+#     trucks_file.write('Plate;CapacityM3;CapacityKG')
+#     trucks_file.write('\n')
+#     for truck in trucks_campolide:
+#         line = str(trucks_campolide[truck].plate) + ';' + \
+#             str(trucks_campolide[truck].capacity) + ';' + \
+#             str(trucks_campolide[truck].capacity_kg) + '\n'
+#         trucks_file.write(line)
+
 rota_E0714_Int = filter(lambda x: x.route == 'E0714 Int', campolide_collection_data_embalagens)
 rota_E0504 = filter(lambda x: x.route == 'E0504', campolide_collection_data_embalagens)
 
