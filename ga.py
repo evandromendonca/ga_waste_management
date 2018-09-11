@@ -94,7 +94,13 @@ def crossover(parent_1, parent_2, helper):
     # if len(subroute) <= 0:
     #     print 'A subrota para crossover não tem nenhum elemento'
 
+    #closest_before_subroute_old = helper.closest_edge_before_old(subroute, parent_1.path)    
     closest_before_subroute = helper.closest_edge_before(subroute, parent_1.path)
+
+    # print 'closest_before_old = ' + str(closest_before_subroute_old)
+    # print 'closest_before = ' + str(closest_before_subroute)
+    # if closest_before_subroute not in (edge[0:3] for edge in parent_1.path):
+    #     print 'DEU MERDA AQUI Ó'
 
     # A CLOSEST EDGE BEFORE PRECISA ESTAR NO PARENT 1 PATH, ENTAO SE VIER UMA EDGE QUE NAO ESTEJA,
     # COM CERTEZA EXISTE UMA CORRESPONDENTE QUE ESTÁ. BASTA BUSCAR ESSA CORRESPONDENTE

@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 import osmnx as ox
 import networkx as nx
 
@@ -6,7 +8,8 @@ class Helper:
         self.G = graph
         self.distance_map = None
         self.all_trucks = trucks
-        self.corresponding_edges = {}        
+        self.corresponding_edges = {} 
+        self.closest_before = {}       
 
         # edges list removing two-ways
         el = list(edges_to_correspond) # lista de todas as edges
@@ -36,6 +39,23 @@ class Helper:
             return
         except:
             return
+
+    def build_closest_before(self):
+        print 'calculating the closest before each edge'
+
+        for edge_to in self.distance_map:
+            self.closest_before[edge_to] = []
+            # get all edges that have some distance to edge
+            for edge_from in self.distance_map:
+                if edge_from == edge_to:
+                    continue
+                if edge_to in self.distance_map[edge_from]:
+                    dist = round(self.distance_map[edge_from][edge_to] - self.distance_map[edge_from][edge_from] - self.distance_map[edge_to][edge_to], 8)
+                    if (dist < 0):
+                        print 'algum error calculando o closest edge before all'
+                    self.closest_before[edge_to].append((edge_from, dist)) # edge and distance in a tuple
+            
+            self.closest_before[edge_to] = sorted(self.closest_before[edge_to], key=lambda x: x[1])
 
     def build_distance_map(self, edges, edges_file):
         print 'calculating distance map'
@@ -156,23 +176,48 @@ class Helper:
     # subroute: the selected subroute
     # total_edges: every edge of the parent that the subroute will be inserted, one of the edges must
     # be the closest before
-    def closest_edge_before(self, subroute, total_edges):
+    #@profile
+    def closest_edge_before_old(self, subroute, total_edges):
         closest_edge = None
         closest_distance = None
-        subroute_set = set([edge[0:3] for edge in subroute])
-        total_edges_set = set([edge[0:3] for edge in total_edges])
+        subroute_set = set([edge[0:3] for edge in subroute])        
         first_edge = subroute[0][0:3]
-        for previous_edge in total_edges_set:
+        for previous_edge in total_edges:
+            previous_edge_abv = previous_edge[0:3]
             # check if the edge is in the edge list, so it can be the closest before it
-            if previous_edge in subroute_set:
+            if previous_edge_abv in subroute_set:
                 continue
             # check if the corresponding edge is in the list, because corresponding edges are served only once per path
-            if previous_edge in self.corresponding_edges and \
-                self.corresponding_edges[previous_edge][0:3] in subroute_set:
+            if previous_edge_abv in self.corresponding_edges and \
+                self.corresponding_edges[previous_edge_abv][0:3] in subroute_set:
                 continue
-            if first_edge in self.distance_map[previous_edge]:
-                if closest_distance == None or closest_distance > self.distance_map[previous_edge][first_edge]:
-                    closest_distance = self.distance_map[previous_edge][first_edge]
-                    closest_edge = previous_edge
+            if first_edge in self.distance_map[previous_edge_abv]:
+                if closest_distance == None or closest_distance > self.distance_map[previous_edge_abv][first_edge]:
+                    closest_distance = self.distance_map[previous_edge_abv][first_edge]
+                    closest_edge = previous_edge_abv
 
         return closest_edge
+
+    #@profile
+    def closest_edge_before(self, subroute, total_edges):        
+        first_edge = subroute[0][0:3]
+        subroute_set = set([edge[0:3] for edge in subroute])
+        total_edges_set = set([edge[0:3] for edge in total_edges])
+        closest = None
+        # essa lista está ordenada da menor distancia para a maior, portanto a primeira edge que não estiver na subroute,
+        # nem a edge oposta a ela estiver na subroute, será a CLOSEST EDGE
+        # isso deve reduzir muito a complexidade
+        for edge_dist in self.closest_before[first_edge]: 
+            edge = edge_dist[0]                        
+            if edge in subroute_set:
+                continue
+            # check if the corresponding edge is in the list, because corresponding edges are served only once per path
+            if edge in self.corresponding_edges and \
+                self.corresponding_edges[edge][0:3] in subroute_set:
+                continue
+            # if the edge in inside the path, return, the corresponding edge can have a greater distance because of the direction            
+            if edge in total_edges_set:
+                closest = edge
+                break
+
+        return closest

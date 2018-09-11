@@ -133,6 +133,7 @@ print 'total weight of Campolide is: ' + str(total_weight)
 # calculate each campolide edge distance
 #distance_map = helper.build_distance_map(G.edges, EDGES_FILE)
 distance_map = helper.build_distance_map_from_files(EDGES_FILE)
+helper.build_closest_before()
 
 duplicates = [item for item, count in collections.Counter(
     [edge for edge in G.edges]).items() if count > 1]
@@ -150,7 +151,7 @@ run_fitness_array = []
 # TOURNAMENT_SIZE = 10
 
 with open('./data/best_fitness_10000_runs.csv', 'w') as fitness_file:
-    for n in range(30):
+    for n in range(2):
         line = '' # line to save on file
         
         print '\nstarting new round...'
@@ -160,7 +161,7 @@ with open('./data/best_fitness_10000_runs.csv', 'w') as fitness_file:
             population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
 
         fit_array = []
-        for i in range(10000): # evolving
+        for i in range(10): # evolving
             population = population.evolve()
             print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
                 population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
