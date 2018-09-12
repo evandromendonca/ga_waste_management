@@ -4,20 +4,14 @@ import random
 from chromosome import Chromosome
 import collections
 
-POPULATION_SIZE = 100
-CROSSOVER_RATE = 0.8
-MUTATION_SWAP_RATE = 0.01
-MUTATION_INVERSION_RATE = 0.01
-TOURNAMENT_SIZE = 10
-
-def mutate(chromosomes):
+def mutate(chromosomes, mutation_rate):
     for chromosome in chromosomes:            
         num = random.random()
-        if num < MUTATION_SWAP_RATE:
+        if num < mutation_rate:
             mutation_swap(chromosome)
 
         num = random.random()
-        if num < MUTATION_INVERSION_RATE:
+        if num < mutation_rate:
             mutation_inverse(chromosome)
 
 def mutation_swap(chromosome):
@@ -63,7 +57,7 @@ def mutation_inverse(chromosome):
 
 # this is to check the performance using line_profiler @ https://github.com/rkern/line_profiler
 #@profile 
-def crossover(parent_1, parent_2, helper):
+def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
     num = random.random()
     if num > CROSSOVER_RATE:
         # since this crossover generates only one child, and the genetic material
@@ -200,7 +194,7 @@ def crossover(parent_1, parent_2, helper):
     return child    
 
 
-def tournament_selection(chromosomes, helper):
+def tournament_selection(chromosomes, helper, TOURNAMENT_SIZE):
     if len(chromosomes) <= 0:
         print 'No chromosome in this population yet'
         return None
@@ -236,7 +230,7 @@ def get_best_fitness(chromosomes, helper):
     return best_fit_chromosome
 
 
-def randomize_population(edges, trucks, corresponding_edges):
+def randomize_population(edges, trucks, corresponding_edges, POPULATION_SIZE):
     chromosomes = []
 
     # generate random routes combinations

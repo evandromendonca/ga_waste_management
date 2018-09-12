@@ -221,3 +221,28 @@ class Helper:
                 break
 
         return closest
+
+    def show_route(self, edges):
+        route = []
+        route.append(edges[0][0])
+        previous_node = edges[0][1]
+        for edge in edges[1:]:            
+            go_node = edge[0] 
+            r = nx.shortest_path(self.G, previous_node, go_node, weight='length')
+            if False and len(r) <= 1:
+                print 'strange... => previus_node:' + str(previous_node) + ' go_node:' +  str(go_node)
+                print r
+            route.extend(r)
+            previous_node = edge[1]
+        
+        print 'route with ' + str(len(route)) + ' nodes'
+        ox.plot_graph_route(self.G, route, route_linewidth=2)
+
+        # # If one wants to see the route
+        # node_1 = edges[0][0]
+        # node_2 = edges[0][1]
+        # route = nx.shortest_path(self.G, node_1, node_2, weight='length')
+        # print 'route: '
+        # print route
+        # ox.plot_graph_route(self.G, route)
+        # route = nx.shortest_path(self.G, 381116687, 247123638, weight='length')

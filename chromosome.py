@@ -65,7 +65,7 @@ class Route:
             return 'capacity exceeded'
 
     def get_route_path(self):
-        return self.full_path[self.initial_index, self.final_index]
+        return self.full_path[self.initial_index:self.final_index]
 
     def get_route_length(self):
         if self.route_length == None:

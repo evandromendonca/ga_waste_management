@@ -149,29 +149,57 @@ run_fitness_array = []
 # MUTATION_SWAP_RATE = 0.01
 # MUTATION_INVERSION_RATE = 0.01
 # TOURNAMENT_SIZE = 10
+params_test = []
+with open('./data/comb_params_tests.csv', 'r') as f:
+    lines = f.read().splitlines()
+    for l in lines[1:]:
+        s = l.split(';')
+        params_test.append((s[1], s[2], s[3], s[4]))
 
-with open('./data/best_fitness_10000_runs.csv', 'w') as fitness_file:
-    for n in range(30):
-        line = '' # line to save on file
-        
-        print '\nstarting new round...'
-        # randomize the initial population
-        population = Population(helper, G.edges(keys=True, data=True), trucks, True)
-        print 'initial population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
-            population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+for i in range(len(params_test)):
+    file_name = './data/params_test_' + str(i+1) + '.csv'
+    
+    # define the parameters, they now go inside the population
+    pop = int(params_test[i][0])
+    tour =  int(params_test[i][1])
+    cross =  float(params_test[i][2])
+    mut =  float(params_test[i][3])
 
-        fit_array = []
-        for i in range(10000): # evolving
-            population = population.evolve()
-            # print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
-            #     population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))            
-            line += str(population.get_best_fitness().fitness) + ';' # increase the line to save
+    with open(file_name, 'w') as f:
+        for n in range(10):
+            line = '' # line to save on file
+            
+            print '\nstarting new round...'
+            
+            # randomize the initial population
+            population = Population(helper, G.edges(keys=True, data=True), trucks, True, pop, tour, cross, mut)
+            print 'initial population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+                population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
 
-        print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
-            population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
-        
-        line += '\n' # jump line
-        fitness_file.write(line) # write on file
+            for i in range(4000): # evolving
+                population = population.evolve()
+                
+                print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+                    population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))            
+                
+                line += str(population.get_best_fitness().fitness) + ';' # increase the line to save
+
+            # # Print the best fitness found
+            # print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+            #     population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+
+            # # Plot the route
+            # best = population.get_best_fitness()
+            # best.generate_routes()
+            # for route in best.routes:
+            #     helper.show_route(route.get_route_path())
+            
+            line += '\n' # jump line
+            f.write(line) # write on file
+
+
+
+
 
 # print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
 #     population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
