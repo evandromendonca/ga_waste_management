@@ -31,6 +31,8 @@ import collections
 import sys
 if __name__ == "__main__":
     start_params_from = int(sys.argv[1])
+    end_param = start_params_from + 9
+    print 'start_param_from [0-35] = ' + str(start_params_from) + ' end param = ' + str(end_param)
 
 # Media de lixo por metro em base nas duas rotas E0504 e E0714 Int = 0.21757637738 kg (vide data_filter.py)
 residuo_metro = 0.21757637738
@@ -160,7 +162,7 @@ with open('./data/comb_params_tests.csv', 'r') as f:
         s = l.split(';')
         params_test.append((s[1], s[2], s[3], s[4]))
 
-for i in range(start_params_from, len(params_test)):
+for i in range(start_params_from, end_param):
     file_name = './data/params_test_' + str(i+1) + '.csv'
     
     # define the parameters, they now go inside the population
