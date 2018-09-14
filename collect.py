@@ -27,12 +27,110 @@ import ga
 from population import Population
 from helper import Helper
 import collections
-
 import sys
+
 if __name__ == "__main__":
-    start_params_from = int(sys.argv[1])
-    end_param = start_params_from + 9
-    print 'start_param_from [0-35] = ' + str(start_params_from) + ' end param = ' + str(end_param)
+    file_name = sys.argv[1]
+    print 'file name is: ' + file_name
+    # this is only for choosing the best parameters for the GA
+    # end_param = start_params_from + 9
+    # print 'start_param_from [0-35] = ' + \
+    #     str(start_params_from) + ' end param = ' + str(end_param)
+
+def population_evolution(num_iterations):
+    ### The parameters choosen were ###
+    # Pop size: 125
+    # Tournament size: 13, in fact 10% rounded up
+    # Crossover rate: 1
+    # Mutation rate: 0,005
+    pop = 125
+    tour = 13
+    cross = 1
+    mut = 0.005
+
+    # teste doido
+    pop = 200
+    tour = 20
+    cross = 1
+    mut = 0.005
+
+    # randomize the initial population
+    population = Population(helper, G.edges(
+        keys=True, data=True), trucks, True, pop, tour, cross, mut)
+    print 'initial population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+        population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+
+    with open(file_name, 'w') as f:
+        for i in range(0, 5):
+            line = ''
+            # evolve the population
+            for i in range(num_iterations):
+                population = population.evolve()
+                print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+                    population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+                line += str(population.get_best_fitness().fitness) + ';'
+            f.write(line)
+            f.write('\n')
+
+    # Print the best fitness found
+    print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+        population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+
+    # # Plot the route
+    # best = population.get_best_fitness()
+    # best.generate_routes()
+    # for route in best.routes:
+    #     helper.show_route(route.get_route_path())
+
+
+### THIS CODE IS FOR CHOOSING THE PARAMETERS ###
+def test_multiple_ga_parameters():
+    run_fitness_array = []
+
+    # Run the tests 30 times with 10.000 iterations and store in the best_fitness_array
+    params_test = []
+    with open('./data/comb_params_tests.csv', 'r') as f:
+        lines = f.read().splitlines()
+        for l in lines[1:]:
+            s = l.split(';')
+            params_test.append((s[1], s[2], s[3], s[4]))
+
+    for i in range(start_params_from, end_param):
+        file_name = './data/params_test_' + str(i+1) + '.csv'
+
+        # define the parameters, they now go inside the population
+        pop = int(params_test[i][0])
+        tour = int(params_test[i][1])
+        cross = float(params_test[i][2])
+        mut = float(params_test[i][3])
+
+        with open(file_name, 'w') as f:
+            for n in range(10):
+
+                # line to save on file
+                line = ''
+
+                print '\nstarting new round...'
+
+                # randomize the initial population
+                population = Population(helper, G.edges(
+                    keys=True, data=True), trucks, True, pop, tour, cross, mut)
+                print 'initial population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+                    population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+
+                # evolving
+                for i in range(4000):
+                    population = population.evolve()
+                    # increase the line to save
+                    line += str(population.get_best_fitness().fitness) + ';'
+
+                # Print the best fitness found
+                print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+                    population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+
+                line += '\n'  # jump line
+                f.write(line)  # write on file
+
 
 # Media de lixo por metro em base nas duas rotas E0504 e E0714 Int = 0.21757637738 kg (vide data_filter.py)
 residuo_metro = 0.21757637738
@@ -86,7 +184,8 @@ except:
     ox.save_graphml(G_projected_lisbon, filename=LISBON_GRAPH)
     print 'done saving in the disk'
 
-print 'We have (' + str(G.number_of_nodes()) + ') nodes and (' + str(G.number_of_edges()) + ') edges'
+print 'We have (' + str(G.number_of_nodes()) + \
+    ') nodes and (' + str(G.number_of_edges()) + ') edges'
 
 # Full city data plot
 # ox.plot_graph(G)
@@ -103,7 +202,8 @@ for edge in edges_to_remove:
     G.remove_edge(edge[0], edge[1], edge[2])
 G.remove_nodes_from(list(nx.isolates(G)))
 
-print 'We have (' + str(G.number_of_nodes()) + ') nodes and (' + str(G.number_of_edges()) + ') edges after removal'
+print 'We have (' + str(G.number_of_nodes()) + ') nodes and (' + \
+    str(G.number_of_edges()) + ') edges after removal'
 
 # # plot the graph
 # print 'plooting'
@@ -141,71 +241,11 @@ print 'total weight of Campolide is: ' + str(total_weight)
 distance_map = helper.build_distance_map_from_files(EDGES_FILE)
 helper.build_closest_before()
 
+# check for duplicates, just in case
 duplicates = [item for item, count in collections.Counter(
     [edge for edge in G.edges]).items() if count > 1]
 if len(duplicates) > 0:
     print 'duplicates in chromosome'
     print duplicates
 
-run_fitness_array = []
-
-# Run the tests 30 times with 10.000 iterations and store in the best_fitness_array
-# POPULATION_SIZE = 100
-# CROSSOVER_RATE = 0.8
-# MUTATION_SWAP_RATE = 0.01
-# MUTATION_INVERSION_RATE = 0.01
-# TOURNAMENT_SIZE = 10
-params_test = []
-with open('./data/comb_params_tests.csv', 'r') as f:
-    lines = f.read().splitlines()
-    for l in lines[1:]:
-        s = l.split(';')
-        params_test.append((s[1], s[2], s[3], s[4]))
-
-for i in range(start_params_from, end_param):
-    file_name = './data/params_test_' + str(i+1) + '.csv'
-    
-    # define the parameters, they now go inside the population
-    pop = int(params_test[i][0])
-    tour =  int(params_test[i][1])
-    cross =  float(params_test[i][2])
-    mut =  float(params_test[i][3])
-
-    with open(file_name, 'w') as f:
-        for n in range(10):
-            line = '' # line to save on file
-            
-            print '\nstarting new round...'
-            
-            # randomize the initial population
-            population = Population(helper, G.edges(keys=True, data=True), trucks, True, pop, tour, cross, mut)
-            print 'initial population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
-                population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
-
-            for i in range(4000): # evolving
-                population = population.evolve()
-                
-                print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
-                    population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))            
-                
-                line += str(population.get_best_fitness().fitness) + ';' # increase the line to save
-
-            # # Print the best fitness found
-            # print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
-            #     population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
-
-            # # Plot the route
-            # best = population.get_best_fitness()
-            # best.generate_routes()
-            # for route in best.routes:
-            #     helper.show_route(route.get_route_path())
-            
-            line += '\n' # jump line
-            f.write(line) # write on file
-
-
-
-
-
-# print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
-#     population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+population_evolution(15000)
