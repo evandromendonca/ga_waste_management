@@ -1,6 +1,4 @@
-import random
 import ga
-
 
 class Population:
     def __init__(self, helper, edges=None, trucks=None, randomize=None, pop=None, tour=None, cross=None, mut=None):
@@ -23,7 +21,7 @@ class Population:
             self.best_fitness = ga.get_best_fitness(self.chromosomes, self.helper)
         return self.best_fitness
 
-    #@profile 
+    @profile 
     def evolve(self):
         # create a new population
         new_population = Population(self.helper, pop=self.POPULATION_SIZE, tour=self.TOURNAMENT_SIZE, cross=self.CROSSOVER_RATE, mut=self.MUTATION_INVERSION_RATE)

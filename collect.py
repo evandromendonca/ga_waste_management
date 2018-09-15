@@ -48,39 +48,60 @@ def population_evolution(num_iterations):
     cross = 1
     mut = 0.005
 
-    # teste doido
-    pop = 200
-    tour = 20
+    pop = 300
+    tour = 30
     cross = 1
-    mut = 0.005
-
-    # randomize the initial population
-    population = Population(helper, G.edges(
-        keys=True, data=True), trucks, True, pop, tour, cross, mut)
-    print 'initial population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
-        population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+    mut = 0.1
 
     with open(file_name, 'w') as f:
-        for i in range(0, 5):
+        best_population = None
+
+        for i in range(0, 1):
+            # randomize the initial population
+            population = Population(helper, G.edges(
+                keys=True, data=True), trucks, True, pop, tour, cross, mut)
+            print 'initial population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
+                population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+
             line = ''
+            last_best_iteration = None
+            last_best_fitness = None
             # evolve the population
             for i in range(num_iterations):
                 population = population.evolve()
                 print 'iteration ' + str(i) + ' best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
                     population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
                 line += str(population.get_best_fitness().fitness) + ';'
+
+                # store the last best fitness and last best iteration
+                if last_best_fitness == None or last_best_fitness > population.get_best_fitness().fitness:
+                    last_best_fitness = population.get_best_fitness().fitness
+                    last_best_iteration = i
+                
+                # check for stop condition, 1000 iterations without improvement 
+                if i - last_best_iteration > 1000:
+                    break
+
             f.write(line)
             f.write('\n')
 
+            if best_population == None or best_population.get_best_fitness().fitness > population.get_best_fitness().fitness:
+                best_population = population
+
     # Print the best fitness found
-    print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
-        population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
+    print 'final best_population best fitness: ' + str(best_population.get_best_fitness().fitness) + ' with ' + str(len(
+        best_population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(best_population.get_best_fitness().path))
+
+    # deposit = filter(lambda x: x[0] == 268440195 and x[1] == 268440181 and x[2] == 0, list(G_lisbon.edges(keys=True, data=True)))[0]
 
     # # Plot the route
-    # best = population.get_best_fitness()
+    # best = best_population.get_best_fitness()
     # best.generate_routes()
     # for route in best.routes:
-    #     helper.show_route(route.get_route_path())
+    #     route_path = route.get_route_path()
+    #     route_path.insert(0, deposit)
+    #     route_path.append(deposit)
+    #     helper.show_route(route_path)
 
 
 ### THIS CODE IS FOR CHOOSING THE PARAMETERS ###
@@ -248,4 +269,4 @@ if len(duplicates) > 0:
     print 'duplicates in chromosome'
     print duplicates
 
-population_evolution(15000)
+population_evolution(10)

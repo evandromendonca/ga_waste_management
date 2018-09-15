@@ -199,10 +199,10 @@ class Helper:
         return closest_edge
 
     #@profile
-    def closest_edge_before(self, subroute, total_edges):        
-        first_edge = subroute[0][0:3]
-        subroute_set = set([edge[0:3] for edge in subroute])
-        total_edges_set = set([edge[0:3] for edge in total_edges])
+    def closest_edge_before(self, first_edge, subroute_set, total_edges_set):        
+        #first_edge = subroute[0][0:3]
+        #subroute_set = set([edge[0:3] for edge in subroute])
+        #total_edges_set = set([edge[0:3] for edge in total_edges])
         closest = None
         # essa lista está ordenada da menor distancia para a maior, portanto a primeira edge que não estiver na subroute,
         # nem a edge oposta a ela estiver na subroute, será a CLOSEST EDGE
@@ -217,6 +217,7 @@ class Helper:
                 continue
             # if the edge in inside the path, return, the corresponding edge can have a greater distance because of the direction            
             if edge in total_edges_set:
+            #if len(filter(lambda x: x[0] == edge[0] and x[1] == edge[1] and x[2] == edge[2], total_edges)) > 0:
                 closest = edge
                 break
 

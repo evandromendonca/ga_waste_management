@@ -1,5 +1,3 @@
-import random
-
 deposit = (268440195, 268440181, 0)
 
 class Chromosome:
@@ -7,7 +5,13 @@ class Chromosome:
         self.path = []
         self.trucks_used = []
         self.routes = []
+        self.path_set = None
         self.fitness = None
+
+    def get_path_set(self):
+        if self.path_set == None:
+            self.path_set = set([edge[0:3] for edge in self.path])
+        return self.path_set
 
     def generate_routes(self):
         # generate a route for each truck used
