@@ -1,4 +1,5 @@
 import ga
+from chromosome import Chromosome
 
 class Population:
     def __init__(self, helper, edges=None, trucks=None, randomize=None, pop=None, tour=None, cross=None, mut=None):
@@ -21,16 +22,19 @@ class Population:
             self.best_fitness = ga.get_best_fitness(self.chromosomes, self.helper)
         return self.best_fitness
 
-    @profile 
+    #@profile 
     def evolve(self):
         # create a new population
         new_population = Population(self.helper, pop=self.POPULATION_SIZE, tour=self.TOURNAMENT_SIZE, cross=self.CROSSOVER_RATE, mut=self.MUTATION_INVERSION_RATE)
 
         # the best fitting solution go to the next population automatically (ELITISM)
-        best_fit = ga.get_best_fitness(self.chromosomes, self.helper)
-        best_fit.fitness = None # reset the fitness (it can mutate)
+        best_fit = ga.get_best_fitness(self.chromosomes, self.helper)                
         
-        new_population.chromosomes.append(best_fit)
+        elit_chromosome = Chromosome()
+        elit_chromosome.path = best_fit.path
+        elit_chromosome.trucks_used = best_fit.trucks_used
+
+        new_population.chromosomes.append(elit_chromosome)
 
         # crossover
         for _ in range(1, len(self.chromosomes)):
@@ -41,6 +45,7 @@ class Population:
             parent_2 = ga.tournament_selection(self.chromosomes, self.helper, self.TOURNAMENT_SIZE)
             # crossover these chomosomes
             child = ga.crossover(parent_1, parent_2, self.helper, self.CROSSOVER_RATE)
+            #child = ga.new_crossover(parent_1, parent_2, self.helper, self.CROSSOVER_RATE)
             
             child.fitness = None  # reset the fitness (it was calculated in the tournament and yet can mutate)
 

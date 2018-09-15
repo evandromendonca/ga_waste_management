@@ -6,18 +6,18 @@ class Chromosome:
         self.trucks_used = []
         self.routes = []
         self.path_set = None
+        self.simple_path = None
         self.fitness = None
 
     def get_path_set(self):
         if self.path_set == None:
-            self.path_set = set([edge[0:3] for edge in self.path])
+            self.path_set = set(self.get_simple_path())
         return self.path_set
 
-    def generate_routes(self):
-        # generate a route for each truck used
-        for truck in self.trucks_used:
-            r = Route(self.path, truck[1], truck[2], truck[0][1])
-            self.routes.append(r)
+    def get_simple_path(self):
+        if (self.simple_path == None):
+            self.simple_path = list([edge[0:3] for edge in self.path])
+        return self.simple_path
 
     # fitness is the total amount of distance of the chromosome
     # must calculate each route total distance, and add a number of
@@ -52,6 +52,11 @@ class Chromosome:
         self.fitness = fitness
         return self.fitness
 
+    def generate_routes(self):
+        # generate a route for each truck used
+        for truck in self.trucks_used:
+            r = Route(self.path, truck[1], truck[2], truck[0][1])
+            self.routes.append(r)
 
 class Route:
     def __init__(self, full_path, init, end, truck_capacity):

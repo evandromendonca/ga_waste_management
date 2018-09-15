@@ -4,6 +4,7 @@ import random
 from chromosome import Chromosome
 import collections
 
+
 def mutate(chromosomes, mutation_rate):
     for chromosome in chromosomes:            
         num = random.random()
@@ -13,6 +14,7 @@ def mutate(chromosomes, mutation_rate):
         num = random.random()
         if num < mutation_rate:
             mutation_inverse(chromosome)
+
 
 def mutation_swap(chromosome):
     # this can fail, so try the mutation 10 times only
@@ -55,8 +57,9 @@ def mutation_inverse(chromosome):
         chromosome.path[i] = edge
         i += 1
 
+
 # this is to check the performance using line_profiler @ https://github.com/rkern/line_profiler
-@profile 
+#@profile 
 def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
     num = random.random()
     if num > CROSSOVER_RATE:
@@ -72,14 +75,24 @@ def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
     truck_end = truck_route[2]
 
     # select a subroute from the chosen truck_route
-    test_1 = int(random.random() * (truck_end - truck_ini)) + truck_ini - 1
-    subroute_ini = random.randint(truck_ini, truck_end - 1)
-    subroute_end = random.randint(subroute_ini, truck_end - 1)
+    subroute_ini = int(random.random() * (truck_end - truck_ini)) + truck_ini
+    subroute_end = int(random.random() * (truck_end - subroute_ini)) + subroute_ini
+    #subroute_ini = random.randint(truck_ini, truck_end - 1)
+    #subroute_end = random.randint(subroute_ini, truck_end - 1)
     subroute_end += 1
 
     subroute = parent_2.path[subroute_ini:subroute_end]
-    subroute_set = set(edge[0:3] for edge in subroute)
-    
+    subroute_simple_path = parent_2.get_simple_path()[subroute_ini:subroute_end]
+
+    # # teste
+    # for i in range(len(subroute)):
+    #     if subroute[i][0] != subroute_simple_path[i][0] or \
+    #         subroute[i][1] != subroute_simple_path[i][1] or \
+    #             subroute[i][2] != subroute_simple_path[i][2]:
+    #         print 'deu merda aqui ó'
+
+    subroute_set = set(subroute_simple_path)
+
     # Must get the subroute weight
     subroute_weight = 0  
     for edge in subroute:
@@ -89,21 +102,15 @@ def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
     # if len(subroute) <= 0:
     #     print 'A subrota para crossover não tem nenhum elemento'
 
-    #closest_before_subroute_old = helper.closest_edge_before_old(subroute, parent_1.path)    
-    closest_before_subroute = helper.closest_edge_before(subroute[0][0:3], subroute_set, parent_1.get_path_set())
+    #closest_before_subroute_old = helper.closest_edge_before_old(subroute, parent_1.path)
+    total_path_set = parent_1.get_path_set()
+    first_subroute_edge = subroute_simple_path[0]
+    closest_before_subroute = helper.closest_edge_before(first_subroute_edge, subroute_set, total_path_set)
 
     # print 'closest_before_old = ' + str(closest_before_subroute_old)
     # print 'closest_before = ' + str(closest_before_subroute)
     # if closest_before_subroute not in (edge[0:3] for edge in parent_1.path):
     #     print 'DEU MERDA AQUI Ó'
-
-    # A CLOSEST EDGE BEFORE PRECISA ESTAR NO PARENT 1 PATH, ENTAO SE VIER UMA EDGE QUE NAO ESTEJA,
-    # COM CERTEZA EXISTE UMA CORRESPONDENTE QUE ESTÁ. BASTA BUSCAR ESSA CORRESPONDENTE
-    # in_path = filter(lambda x: x[0:3] == closest_before_subroute, parent_1.path)
-    # if (len(in_path) > 1):
-    #     print 'merda aqui'
-    # if (len(in_path) == 0):
-    #     closest_before_subroute = helper.corresponding_edges[closest_before_subroute][0:3]
 
     # now create a child inserting the subroute created in the parent_1
     child = Chromosome()
@@ -141,6 +148,8 @@ def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
             else:
                 to_new_truck.append(edge)
 
+            # aqui pode acontecer de a edge não ter sido inserida e a subroute ser
+            # porque a edge pode ser maior que a subroute e nao coube no truck
             if edge_abv == closest_before_subroute:
                 # check the capacity here
                 if truck_capacity >= truck_used_capacity + subroute_weight:
@@ -167,7 +176,11 @@ def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
             t_start = len(child.path)
             t_end = t_start
             # start filling the truck with the sequence of edges
-            for edge in to_new_truck[served_edges:]:            
+            for edge in to_new_truck[served_edges:]: 
+                # # teste
+                # if edge in child.path:
+                #     print 'repetido'
+
                 if t_fill + edge[3]['weight'] <= t_capacity:
                     t_fill += edge[3]['weight']
                     t_end += 1
@@ -194,7 +207,8 @@ def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
 
     return child    
 
-@profile
+
+#@profile
 def tournament_selection(chromosomes, helper, TOURNAMENT_SIZE):
     if len(chromosomes) <= 0:
         print 'No chromosome in this population yet'
@@ -302,8 +316,6 @@ def randomize_population(edges, trucks, corresponding_edges, POPULATION_SIZE):
     return chromosomes
 
 
-
-
 # this is to check the performance using line_profiler @ https://github.com/rkern/line_profiler
 #@profile 
 def new_crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
@@ -321,13 +333,24 @@ def new_crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
     truck_end = truck_route[2]
 
     # select a subroute from the chosen truck_route
-    subroute_ini = random.randint(truck_ini, truck_end - 1)
-    subroute_end = random.randint(subroute_ini, truck_end - 1)
+    subroute_ini = int(random.random() * (truck_end - truck_ini)) + truck_ini
+    subroute_end = int(random.random() * (truck_end - subroute_ini)) + subroute_ini
+    #subroute_ini = random.randint(truck_ini, truck_end - 1)
+    #subroute_end = random.randint(subroute_ini, truck_end - 1)
     subroute_end += 1
 
     subroute = parent_2.path[subroute_ini:subroute_end]
-    subroute_set = set(edge[0:3] for edge in subroute)
-    
+    subroute_simple_path = parent_2.get_simple_path()[subroute_ini:subroute_end]
+
+    # # teste
+    # for i in range(len(subroute)):
+    #     if subroute[i][0] != subroute_simple_path[i][0] or \
+    #         subroute[i][1] != subroute_simple_path[i][1] or \
+    #             subroute[i][2] != subroute_simple_path[i][2]:
+    #         print 'deu merda aqui ó'
+
+    subroute_set = set(subroute_simple_path)
+
     # Must get the subroute weight
     subroute_weight = 0  
     for edge in subroute:
@@ -337,21 +360,15 @@ def new_crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
     # if len(subroute) <= 0:
     #     print 'A subrota para crossover não tem nenhum elemento'
 
-    #closest_before_subroute_old = helper.closest_edge_before_old(subroute, parent_1.path)    
-    closest_before_subroute = helper.closest_edge_before(subroute, parent_1.path)
+    #closest_before_subroute_old = helper.closest_edge_before_old(subroute, parent_1.path)
+    total_path_set = parent_1.get_path_set()
+    first_subroute_edge = subroute_simple_path[0]
+    closest_before_subroute = helper.closest_edge_before(first_subroute_edge, subroute_set, total_path_set)
 
     # print 'closest_before_old = ' + str(closest_before_subroute_old)
     # print 'closest_before = ' + str(closest_before_subroute)
     # if closest_before_subroute not in (edge[0:3] for edge in parent_1.path):
     #     print 'DEU MERDA AQUI Ó'
-
-    # A CLOSEST EDGE BEFORE PRECISA ESTAR NO PARENT 1 PATH, ENTAO SE VIER UMA EDGE QUE NAO ESTEJA,
-    # COM CERTEZA EXISTE UMA CORRESPONDENTE QUE ESTÁ. BASTA BUSCAR ESSA CORRESPONDENTE
-    # in_path = filter(lambda x: x[0:3] == closest_before_subroute, parent_1.path)
-    # if (len(in_path) > 1):
-    #     print 'merda aqui'
-    # if (len(in_path) == 0):
-    #     closest_before_subroute = helper.corresponding_edges[closest_before_subroute][0:3]
 
     # now create a child inserting the subroute created in the parent_1
     child = Chromosome()
@@ -389,14 +406,24 @@ def new_crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
             else:
                 to_new_truck.append(edge)
 
+            # aqui pode acontecer de a edge não ter sido inserida e a subroute ser
+            # porque a edge pode ser maior que a subroute e nao coube no truck
             if edge_abv == closest_before_subroute:
-                # check the capacity here
-                if truck_capacity >= truck_used_capacity + subroute_weight:
-                    new_end += len(subroute)
-                    truck_used_capacity += subroute_weight
-                    child.path.extend(subroute)
-                else:
-                    to_new_truck.extend(subroute)
+                for sub_edge in subroute:
+                    if truck_capacity >= truck_used_capacity + sub_edge[3]['weight']:
+                        new_end += 1
+                        truck_used_capacity += sub_edge[3]['weight']
+                        child.path.append(sub_edge)
+                    else:
+                        to_new_truck.append(sub_edge)
+                
+                # # check the capacity here
+                # if truck_capacity >= truck_used_capacity + subroute_weight:
+                #     new_end += len(subroute)
+                #     truck_used_capacity += subroute_weight
+                #     child.path.extend(subroute)
+                # else:
+                #     to_new_truck.extend(subroute)
 
         if new_end - new_start > 0: 
             child.trucks_used.append(
@@ -415,7 +442,11 @@ def new_crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
             t_start = len(child.path)
             t_end = t_start
             # start filling the truck with the sequence of edges
-            for edge in to_new_truck[served_edges:]:            
+            for edge in to_new_truck[served_edges:]: 
+                # # teste
+                # if edge in child.path:
+                #     print 'repetido'
+
                 if t_fill + edge[3]['weight'] <= t_capacity:
                     t_fill += edge[3]['weight']
                     t_end += 1

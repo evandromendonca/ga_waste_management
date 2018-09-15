@@ -48,8 +48,8 @@ def population_evolution(num_iterations):
     cross = 1
     mut = 0.005
 
-    pop = 300
-    tour = 30
+    pop = 25
+    tour = 5
     cross = 1
     mut = 0.1
 
@@ -269,4 +269,4 @@ if len(duplicates) > 0:
     print 'duplicates in chromosome'
     print duplicates
 
-population_evolution(10)
+population_evolution(7000)
