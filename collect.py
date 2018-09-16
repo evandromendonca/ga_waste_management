@@ -49,7 +49,7 @@ def population_evolution(num_iterations):
     mut = 0.005
 
     pop = 25
-    tour = 5
+    tour = 3
     cross = 1
     mut = 0.1
 
@@ -245,14 +245,19 @@ helper = Helper(G_lisbon, trucks, list(G.edges(keys=True, data=True)))
 # SUM of every edge in Campolide
 total_length = 0
 total_weight = 0
+way_count = 0
 cor_seen_edges = []
 for edge in G.edges(keys=True, data=True):
     if edge[0:3] in cor_seen_edges:
         continue
     if edge[0:3] in helper.corresponding_edges:
         cor_seen_edges.append(helper.corresponding_edges[edge[0:3]][0:3])
+        if helper.corresponding_edges[edge[0:3]][3]['length'] != edge[3]['length']:
+            print 'ó ó ó aqui tiu!!!'
     total_length += edge[3]['length']
     total_weight += edge[3]['weight']
+    way_count += 1
+print 'Total ways of campolide to serve: ' +str(way_count)
 print 'total length of Campolide is: ' + str(total_length)
 print 'total weight of Campolide is: ' + str(total_weight)
 

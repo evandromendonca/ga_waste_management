@@ -158,7 +158,7 @@ class Helper:
         #print 'distance between '+ str(edges[0][0:2]) +' and '+ str(edges[1][0:2]) + ' = ' + str(self.distance_map[edges[0][0:2]][edges[1][0:2]])
         distance += self.distance_map[edges[0][0:3]][edges[1][0:3]]
 
-        for i in range(2, len(edges[2:])):
+        for i in range(2, len(edges)):
             #print 'distance between '+ str(edges[i - 1][0:2])+ ' and '+ str(edges[i][0:2]) + ' = ' + str(self.distance_map[edges[i - 1][0:2]][edges[i][0:2]])
             distance += self.distance_map[edges[i - 1][0:3]][edges[i][0:3]]
             #print 'distance between '+ str(edges[i - 1]) +' and '+ str(edges[i - 1]) + ' = ' + str(self.distance_map[str(edges[i - 1])][str(edges[i - 1])])
