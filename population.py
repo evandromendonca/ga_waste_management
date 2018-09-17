@@ -31,13 +31,17 @@ class Population:
         best_fit = ga.get_best_fitness(self.chromosomes, self.helper)                
         
         elit_chromosome = Chromosome()
-        elit_chromosome.path = best_fit.path
-        elit_chromosome.trucks_used = best_fit.trucks_used
+        elit_chromosome.path = list(best_fit.path)
+        elit_chromosome.trucks_used = list(best_fit.trucks_used)
 
         new_population.chromosomes.append(elit_chromosome)
 
+        elit_unchanged = Chromosome()
+        elit_unchanged.path = list(best_fit.path)
+        elit_unchanged.trucks_used = list(best_fit.trucks_used)
+
         # crossover
-        for _ in range(1, len(self.chromosomes)):
+        for _ in range(2, len(self.chromosomes)):
             #print 'generating child ' + str(i)
             # must select parent 1 using TOURNAMENT SELECTION
             parent_1 = ga.tournament_selection(self.chromosomes, self.helper, self.TOURNAMENT_SIZE)
@@ -52,6 +56,12 @@ class Population:
             new_population.chromosomes.append(child)
         
         # mutate
-        ga.mutate(new_population.chromosomes, self.MUTATION_INVERSION_RATE)
+        ga.mutate(new_population.chromosomes, self.helper, self.MUTATION_INVERSION_RATE)
+
+        # insert one unchanged elit (to keep the best if its the case)
+        new_population.chromosomes.append(elit_unchanged)
+
+        if len(new_population.chromosomes) != self.POPULATION_SIZE:
+            print 'POPULATION WITH DFF SIZE'
 
         return new_population

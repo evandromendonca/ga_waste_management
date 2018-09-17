@@ -48,9 +48,9 @@ def population_evolution(num_iterations):
     cross = 1
     mut = 0.005
 
-    pop = 25
-    tour = 3
-    cross = 1
+    pop = 30
+    tour = 10
+    cross = 0.75
     mut = 0.1
 
     with open(file_name, 'w') as f:

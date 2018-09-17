@@ -5,7 +5,7 @@ from chromosome import Chromosome
 import collections
 
 
-def mutate(chromosomes, mutation_rate):
+def mutate(chromosomes, helper, mutation_rate):
     for chromosome in chromosomes:            
         num = random.random()
         if num < mutation_rate:
@@ -14,6 +14,20 @@ def mutate(chromosomes, mutation_rate):
         num = random.random()
         if num < mutation_rate:
             mutation_inverse(chromosome)
+
+        num = random.random()
+        if num < mutation_rate:
+            mutation_insertion(chromosome, helper)
+
+            if len(chromosome.path) != 309:
+                print 'tamanho errado'
+
+            if chromosome.trucks_used[-1][2] != 309:
+                print 'truck ultrapassou'
+
+            for truck in chromosome.trucks_used:
+                if truck[3] == 0:
+                    print 'truck vazio'
 
 
 def mutation_swap(chromosome):
@@ -58,16 +72,124 @@ def mutation_inverse(chromosome):
         i += 1
 
 
+def remove_edge_path(chromosome, truck_index, edge, weight):
+    chromosome.path.remove(edge)
+    truck_found = False
+    to_remove_truck = None
+    for i in range(len(chromosome.trucks_used)):
+        if truck_found:
+            truck = chromosome.trucks_used[i]
+            new_start = truck[1] - 1 # remove 1 from the start 
+            new_end = truck[2] - 1 # remove 1 from the end
+            if new_end > 309:
+                print 'errou 1'
+            new_fill = truck[3]
+            chromosome.trucks_used[i] = (truck[0], new_start, new_end, new_fill)
+        if i == truck_index:
+            truck_found = True
+            truck = chromosome.trucks_used[i]
+            new_start = truck[1]
+            new_end = truck[2] - 1 # remove 1 from the end
+            if new_end > 309:
+                print 'errou 2'
+            new_fill = truck[3] - weight # remove the weight
+            if new_end - new_start > 0:
+                chromosome.trucks_used[i] = (truck[0], new_start, new_end, new_fill)
+            else:
+                to_remove_truck = truck
+    
+    if to_remove_truck != None:
+        chromosome.trucks_used.remove(to_remove_truck)
+
+    if chromosome.trucks_used[-1][2] != 308:
+        print 'errou 3'
+
+def add_edge_path(chromosome, truck_index, edge, weight, index):
+    chromosome.path.insert(index, edge)
+    truck_found = False
+    for i in range(len(chromosome.trucks_used)):
+        if truck_found:
+            truck = chromosome.trucks_used[i]
+            new_start = truck[1] + 1 # add 1 in the start 
+            new_end = truck[2] + 1 # add 1 in the end
+            if new_end > 309:
+                print 'eroru 4'
+            new_fill = truck[3]
+            chromosome.trucks_used[i] = (truck[0], new_start, new_end, new_fill)
+        if i == truck_index:
+            truck_found = True
+            truck = chromosome.trucks_used[i]
+            new_start = truck[1]
+            new_end = truck[2] + 1 # add 1 in the end
+            if new_end > 309:
+                print 'eroru 5'
+            new_fill = truck[3] + weight # add the weight
+            chromosome.trucks_used[i] = (truck[0], new_start, new_end, new_fill)
+
+    if chromosome.trucks_used[-1][2] != 309:
+        print 'errou 6: ' + str(chromosome.trucks_used[-1][2])
+        
+def mutation_insertion(chromosome, helper):
+    # select a truck and a edge randomly
+    first_truck = random.choice(chromosome.trucks_used)
+    first_truck_index = chromosome.trucks_used.index(first_truck)
+    index = random.randint(first_truck[1], first_truck[2] - 1)
+    edge = chromosome.path[index]
+    edge_weight = edge[3]['weight']
+
+    # check if a new truck will be added
+    add_truck_rate = (1 / float((2 * len(chromosome.trucks_used))))
+    num = random.random()
+    if num > add_truck_rate:
+        for _ in range(10):
+            #select a second truck randomly, and an index to insert the previously selected edge after
+            second_truck = random.choice(chromosome.trucks_used)
+
+            if second_truck == first_truck and first_truck[2] - first_truck[1] <= 1:
+                continue
+
+            second_truck_index = chromosome.trucks_used.index(second_truck)
+            second_truck_capacity = second_truck[0][1]
+            second_truck_fill = second_truck[3]
+            total_trucks = len(chromosome.trucks_used)
+
+            if second_truck_capacity > second_truck_fill + edge_weight:
+                remove_edge_path(chromosome, first_truck_index, edge, edge_weight)
+                if second_truck_index >= first_truck_index and len(chromosome.trucks_used) < total_trucks:
+                    second_truck_index -= total_trucks - len(chromosome.trucks_used)
+                    if second_truck_index < 0 or second_truck_index > len(chromosome.trucks_used) - 1:
+                        print 'index do second_truck errado'
+                second_truck = chromosome.trucks_used[second_truck_index] 
+                second_index = random.randint(second_truck[1], second_truck[2] - 1)
+                add_edge_path(chromosome, second_truck_index, edge, edge_weight, second_index)
+                return
+    else:
+        for _ in range(10):
+            # add a new truck to the chromosome:
+            truck = random.choice(helper.all_trucks)
+            if truck[0][1] > edge_weight:
+                remove_edge_path(chromosome, first_truck_index, edge, edge_weight)
+                t_start = chromosome.trucks_used[-1][2]
+                t_end = t_start + 1
+                t_fill = edge_weight
+                chromosome.path.append(edge)
+                chromosome.trucks_used.append((truck, t_start, t_end, t_fill))
+                return
+
+
 # this is to check the performance using line_profiler @ https://github.com/rkern/line_profiler
 #@profile 
-def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
+def old_crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
     num = random.random()
     if num > CROSSOVER_RATE:
         # since this crossover generates only one child, and the genetic material
         # is not shared between the two parents, I'm choosing to pass the one that
         # is being used to insert the genetic material from the other, so more of him would
         # be passed anyway
-        return parent_1 
+        same_parent = Chromosome()
+        same_parent.path = list(parent_1.path)
+        same_parent.trucks_used = list(parent_1.trucks_used)
+        return same_parent 
     
     # select a truck from the parent 2
     truck_route = random.choice(parent_2.trucks_used)
@@ -136,9 +258,9 @@ def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
                 helper.corresponding_edges[edge_abv][0:3] in subroute_set):
                 continue
                 
-            # # teste
-            # if edge in child.path:
-            #     print 'repetido'
+            # teste
+            if edge in child.path:
+                print 'repetido'
 
             # check the capacity here
             if truck_capacity >= truck_used_capacity + edge[3]['weight']:
@@ -165,6 +287,9 @@ def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
 
         last_end = new_end
 
+    if len(child.path) + len(to_new_truck) > 309:
+        print 'tamanho ultrapassa'
+
     # serve the edges that were not served yet due to smth
     if len(to_new_truck) > 0:
         served_edges = 0
@@ -177,9 +302,9 @@ def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
             t_end = t_start
             # start filling the truck with the sequence of edges
             for edge in to_new_truck[served_edges:]: 
-                # # teste
-                # if edge in child.path:
-                #     print 'repetido'
+                # teste
+                if edge in child.path:
+                    print 'repetido'
 
                 if t_fill + edge[3]['weight'] <= t_capacity:
                     t_fill += edge[3]['weight']
@@ -195,15 +320,18 @@ def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
             if t_end - t_start > 0:
                 child.trucks_used.append((truck, t_start, t_end, t_fill))
 
-    # # teste
-    # duplicates = [item for item, count in collections.Counter([edge[0:3] for edge in child.path]).items() if count > 1]
-    # if len(duplicates) > 0:
-    #     print 'duplicates found:'
-    #     print duplicates
+    # teste
+    duplicates = [item for item, count in collections.Counter([edge[0:3] for edge in child.path]).items() if count > 1]
+    if len(duplicates) > 0:
+        print 'duplicates found:'
+        print duplicates
 
-    # # teste
-    # if (len(child.path) != len(parent_1.path) or len(child.path) != len(parent_2.path)):
-    #     print 'Tamanho filho é diferente do que algum dos pais'
+    # teste
+    if (len(child.path) != len(parent_1.path) or len(child.path) != len(parent_2.path)):
+        print 'Tamanho filho é diferente do que algum dos pais'
+
+    if len(child.path) != 309:
+        print 'cross error'
 
     return child    
 
@@ -318,14 +446,17 @@ def randomize_population(edges, trucks, corresponding_edges, POPULATION_SIZE):
 
 # this is to check the performance using line_profiler @ https://github.com/rkern/line_profiler
 #@profile 
-def new_crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
+def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
     num = random.random()
     if num > CROSSOVER_RATE:
         # since this crossover generates only one child, and the genetic material
         # is not shared between the two parents, I'm choosing to pass the one that
         # is being used to insert the genetic material from the other, so more of him would
         # be passed anyway
-        return parent_1 
+        same_parent = Chromosome()
+        same_parent.path = list(parent_1.path)
+        same_parent.trucks_used = list(parent_1.trucks_used)
+        return same_parent  
     
     # select a truck from the parent 2
     truck_route = random.choice(parent_2.trucks_used)
