@@ -52,6 +52,7 @@ class Population:
             #child = ga.new_crossover(parent_1, parent_2, self.helper, self.CROSSOVER_RATE)
             
             child.fitness = None  # reset the fitness (it was calculated in the tournament and yet can mutate)
+            child.deposit_distance = None
 
             new_population.chromosomes.append(child)
         

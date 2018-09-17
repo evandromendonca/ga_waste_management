@@ -8,6 +8,7 @@ class Chromosome:
         self.path_set = None
         self.simple_path = None
         self.fitness = None
+        self.deposit_distance = None
 
     def get_path_set(self):
         if self.path_set == None:
@@ -46,6 +47,10 @@ class Chromosome:
             distance_deposit_first_edge = distance_deposit_first_edge - helper.calc_distance([edges[0]])
             fitness += distance_deposit_first_edge
 
+            if self.deposit_distance == None:
+                self.deposit_distance = distance_deposit_first_edge + distance_last_edge_deposit
+            else:
+                self.deposit_distance += distance_deposit_first_edge + distance_last_edge_deposit
             #print 'distance from deposit=' + str(distance_deposit_first_edge)
             #print 'distance to deposit=' + str(distance_last_edge_deposit)
 

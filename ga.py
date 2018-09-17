@@ -592,14 +592,14 @@ def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
             if t_end - t_start > 0:
                 child.trucks_used.append((truck, t_start, t_end, t_fill))
 
-    # # teste
-    # duplicates = [item for item, count in collections.Counter([edge[0:3] for edge in child.path]).items() if count > 1]
-    # if len(duplicates) > 0:
-    #     print 'duplicates found:'
-    #     print duplicates
+    # teste
+    duplicates = [item for item, count in collections.Counter([edge[0:3] for edge in child.path]).items() if count > 1]
+    if len(duplicates) > 0:
+        print 'duplicates found:'
+        print duplicates
 
-    # # teste
-    # if (len(child.path) != len(parent_1.path) or len(child.path) != len(parent_2.path)):
-    #     print 'Tamanho filho é diferente do que algum dos pais'
+    # teste
+    if (len(child.path) != len(parent_1.path) or len(child.path) != len(parent_2.path)):
+        print 'Tamanho filho é diferente do que algum dos pais'
 
     return child    

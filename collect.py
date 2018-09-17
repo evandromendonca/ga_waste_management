@@ -50,8 +50,8 @@ def population_evolution(num_iterations):
 
     pop = 30
     tour = 10
-    cross = 0.75
-    mut = 0.1
+    cross = 1
+    mut = 0.105
 
     with open(file_name, 'w') as f:
         best_population = None
@@ -90,7 +90,9 @@ def population_evolution(num_iterations):
 
     # Print the best fitness found
     print 'final best_population best fitness: ' + str(best_population.get_best_fitness().fitness) + ' with ' + str(len(
-        best_population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(best_population.get_best_fitness().path))
+        best_population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(best_population.get_best_fitness().path)) + \
+        ' - Distance from deposit: ' + str(best_population.get_best_fitness().deposit_distance) + ' - Difference: ' + \
+        str(best_population.get_best_fitness().fitness - best_population.get_best_fitness().deposit_distance)
 
     # deposit = filter(lambda x: x[0] == 268440195 and x[1] == 268440181 and x[2] == 0, list(G_lisbon.edges(keys=True, data=True)))[0]
 
