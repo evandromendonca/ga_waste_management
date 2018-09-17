@@ -258,9 +258,9 @@ def old_crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
                 helper.corresponding_edges[edge_abv][0:3] in subroute_set):
                 continue
                 
-            # teste
-            if edge in child.path:
-                print 'repetido'
+            # # teste
+            # if edge in child.path:
+            #     print 'repetido'
 
             # check the capacity here
             if truck_capacity >= truck_used_capacity + edge[3]['weight']:
@@ -302,9 +302,9 @@ def old_crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
             t_end = t_start
             # start filling the truck with the sequence of edges
             for edge in to_new_truck[served_edges:]: 
-                # teste
-                if edge in child.path:
-                    print 'repetido'
+                # # teste
+                # if edge in child.path:
+                #     print 'repetido'
 
                 if t_fill + edge[3]['weight'] <= t_capacity:
                     t_fill += edge[3]['weight']
@@ -320,15 +320,15 @@ def old_crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
             if t_end - t_start > 0:
                 child.trucks_used.append((truck, t_start, t_end, t_fill))
 
-    # teste
-    duplicates = [item for item, count in collections.Counter([edge[0:3] for edge in child.path]).items() if count > 1]
-    if len(duplicates) > 0:
-        print 'duplicates found:'
-        print duplicates
+    # # teste
+    # duplicates = [item for item, count in collections.Counter([edge[0:3] for edge in child.path]).items() if count > 1]
+    # if len(duplicates) > 0:
+    #     print 'duplicates found:'
+    #     print duplicates
 
-    # teste
-    if (len(child.path) != len(parent_1.path) or len(child.path) != len(parent_2.path)):
-        print 'Tamanho filho é diferente do que algum dos pais'
+    # # teste
+    # if (len(child.path) != len(parent_1.path) or len(child.path) != len(parent_2.path)):
+    #     print 'Tamanho filho é diferente do que algum dos pais'
 
     if len(child.path) != 309:
         print 'cross error'
@@ -592,14 +592,14 @@ def crossover(parent_1, parent_2, helper, CROSSOVER_RATE):
             if t_end - t_start > 0:
                 child.trucks_used.append((truck, t_start, t_end, t_fill))
 
-    # teste
-    duplicates = [item for item, count in collections.Counter([edge[0:3] for edge in child.path]).items() if count > 1]
-    if len(duplicates) > 0:
-        print 'duplicates found:'
-        print duplicates
+    # # teste
+    # duplicates = [item for item, count in collections.Counter([edge[0:3] for edge in child.path]).items() if count > 1]
+    # if len(duplicates) > 0:
+    #     print 'duplicates found:'
+    #     print duplicates
 
-    # teste
-    if (len(child.path) != len(parent_1.path) or len(child.path) != len(parent_2.path)):
-        print 'Tamanho filho é diferente do que algum dos pais'
+    # # teste
+    # if (len(child.path) != len(parent_1.path) or len(child.path) != len(parent_2.path)):
+    #     print 'Tamanho filho é diferente do que algum dos pais'
 
     return child    

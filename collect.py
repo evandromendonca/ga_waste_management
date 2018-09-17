@@ -30,12 +30,14 @@ import collections
 import sys
 
 if __name__ == "__main__":
-    file_name = sys.argv[1]
-    print 'file name is: ' + file_name
+    # file_name = sys.argv[1]
+    # print 'file name is: ' + file_name
+    
     # this is only for choosing the best parameters for the GA
-    # end_param = start_params_from + 9
-    # print 'start_param_from [0-35] = ' + \
-    #     str(start_params_from) + ' end param = ' + str(end_param)
+    start_params_from = int(sys.argv[1])
+    end_param = start_params_from + 9
+    print 'start_param_from [0-35] = ' + \
+        str(start_params_from) + ' end param = ' + str(end_param)
 
 def population_evolution(num_iterations):
     ### The parameters choosen were ###
@@ -43,20 +45,20 @@ def population_evolution(num_iterations):
     # Tournament size: 13, in fact 10% rounded up
     # Crossover rate: 1
     # Mutation rate: 0,005
-    pop = 125
+    pop = 126 # MUST BE AN EVEN NUMBER
     tour = 13
     cross = 1
     mut = 0.005
 
-    pop = 30
-    tour = 10
-    cross = 1
-    mut = 0.105
+    # pop = 130
+    # tour = 26
+    # cross = 0.9
+    # mut = 0.01
 
     with open(file_name, 'w') as f:
         best_population = None
 
-        for i in range(0, 1):
+        for i in range(0, 10):
             # randomize the initial population
             population = Population(helper, G.edges(
                 keys=True, data=True), trucks, True, pop, tour, cross, mut)
@@ -78,9 +80,9 @@ def population_evolution(num_iterations):
                     last_best_fitness = population.get_best_fitness().fitness
                     last_best_iteration = i
                 
-                # check for stop condition, 1000 iterations without improvement 
-                if i - last_best_iteration > 1000:
-                    break
+                # # check for stop condition, 1000 iterations without improvement 
+                # if i - last_best_iteration > 1000:
+                #     break
 
             f.write(line)
             f.write('\n')
@@ -108,11 +110,9 @@ def population_evolution(num_iterations):
 
 ### THIS CODE IS FOR CHOOSING THE PARAMETERS ###
 def test_multiple_ga_parameters():
-    run_fitness_array = []
-
     # Run the tests 30 times with 10.000 iterations and store in the best_fitness_array
     params_test = []
-    with open('./data/comb_params_tests.csv', 'r') as f:
+    with open('./data/params_test/comb_params_tests.csv', 'r') as f:
         lines = f.read().splitlines()
         for l in lines[1:]:
             s = l.split(';')
@@ -128,7 +128,7 @@ def test_multiple_ga_parameters():
         mut = float(params_test[i][3])
 
         with open(file_name, 'w') as f:
-            for n in range(10):
+            for _ in range(10):
 
                 # line to save on file
                 line = ''
@@ -142,10 +142,11 @@ def test_multiple_ga_parameters():
                     population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(population.get_best_fitness().path))
 
                 # evolving
-                for i in range(4000):
+                for i in range(10000):
                     population = population.evolve()
                     # increase the line to save
                     line += str(population.get_best_fitness().fitness) + ';'
+                    print 'iteration: ' + str(i)
 
                 # Print the best fitness found
                 print 'final population best fitness: ' + str(population.get_best_fitness().fitness) + ' with ' + str(len(
@@ -276,4 +277,7 @@ if len(duplicates) > 0:
     print 'duplicates in chromosome'
     print duplicates
 
-population_evolution(7000)
+#population_evolution(7000)
+#population_evolution(10000)
+
+test_multiple_ga_parameters()

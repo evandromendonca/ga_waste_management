@@ -41,20 +41,25 @@ class Population:
         elit_unchanged.trucks_used = list(best_fit.trucks_used)
 
         # crossover
-        for _ in range(2, len(self.chromosomes)):
+        for _ in range((self.POPULATION_SIZE - 2)/2):
             #print 'generating child ' + str(i)
             # must select parent 1 using TOURNAMENT SELECTION
             parent_1 = ga.tournament_selection(self.chromosomes, self.helper, self.TOURNAMENT_SIZE)
             # must select parent 2 using TOURNAMENT SELECTION
             parent_2 = ga.tournament_selection(self.chromosomes, self.helper, self.TOURNAMENT_SIZE)
-            # crossover these chomosomes
-            child = ga.crossover(parent_1, parent_2, self.helper, self.CROSSOVER_RATE)
-            #child = ga.new_crossover(parent_1, parent_2, self.helper, self.CROSSOVER_RATE)
             
+            # crossover these chomosomes
+            child = ga.crossover(parent_1, parent_2, self.helper, self.CROSSOVER_RATE)            
             child.fitness = None  # reset the fitness (it was calculated in the tournament and yet can mutate)
             child.deposit_distance = None
 
             new_population.chromosomes.append(child)
+
+            child2 = ga.crossover(parent_2, parent_1, self.helper, self.CROSSOVER_RATE)
+            child2.fitness = None  # reset the fitness (it was calculated in the tournament and yet can mutate)
+            child2.deposit_distance = None
+
+            new_population.chromosomes.append(child2)
         
         # mutate
         ga.mutate(new_population.chromosomes, self.helper, self.MUTATION_INVERSION_RATE)
