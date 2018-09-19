@@ -30,14 +30,14 @@ import collections
 import sys
 
 if __name__ == "__main__":
-    # file_name = sys.argv[1]
-    # print 'file name is: ' + file_name
+    file_name = sys.argv[1]
+    print 'file name is: ' + file_name
     
-    # this is only for choosing the best parameters for the GA
-    start_params_from = int(sys.argv[1])
-    end_param = start_params_from + 9
-    print 'start_param_from [0-35] = ' + \
-        str(start_params_from) + ' end param = ' + str(end_param)
+    # # this is only for choosing the best parameters for the GA
+    # start_params_from = int(sys.argv[1])
+    # end_param = start_params_from + 9
+    # print 'start_param_from [0-35] = ' + \
+    #     str(start_params_from) + ' end param = ' + str(end_param)
 
 def population_evolution(num_iterations):
     ### The parameters choosen were ###
@@ -48,7 +48,7 @@ def population_evolution(num_iterations):
     pop = 126 # MUST BE AN EVEN NUMBER
     tour = 13
     cross = 1
-    mut = 0.005
+    mut = 0.01
 
     # pop = 130
     # tour = 26
@@ -278,6 +278,6 @@ if len(duplicates) > 0:
     print duplicates
 
 #population_evolution(7000)
-#population_evolution(10000)
+population_evolution(10000)
 
-test_multiple_ga_parameters()
+# test_multiple_ga_parameters()

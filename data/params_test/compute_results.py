@@ -12,7 +12,7 @@ with open('./data/params_test/comb_params_tests.csv', 'r') as comb_files:
             results_array = []
             for test_line in test_lines:
                 results_array.append(test_line.split(';'))
-            for j in range(0, 4000):
+            for j in range(0, 10000):
                 avg = 0
                 for k in range(0,10):
                     avg += float(results_array[k][j])
@@ -26,8 +26,11 @@ with open('./data/params_test/tests_results.csv', 'w') as result_file:
         result_file.write(comb)
         result_file.write(';') # jump column
         result_file.write(';')
-        for i in range(0, 4001, 200):
-            result_file.write(str(dict_comb[comb][i]))
+        for i in range(0, 10001, 200):
+            if i == 10000:
+                result_file.write(str(dict_comb[comb][9999]))
+            else:
+                result_file.write(str(dict_comb[comb][i]))
             result_file.write(';')
         result_file.write('\n')
 
