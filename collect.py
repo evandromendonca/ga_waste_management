@@ -28,6 +28,7 @@ from population import Population
 from helper import Helper
 import collections
 import sys
+import json
 
 if __name__ == "__main__":
     file_name = sys.argv[1]
@@ -55,10 +56,12 @@ def population_evolution(num_iterations):
     # cross = 0.9
     # mut = 0.01
 
+    best_solutions = []
+
     with open(file_name, 'w') as f:
         best_population = None
 
-        for i in range(0, 10):
+        for i in range(0, 1):
             # randomize the initial population
             population = Population(helper, G.edges(
                 keys=True, data=True), trucks, True, pop, tour, cross, mut)
@@ -80,15 +83,21 @@ def population_evolution(num_iterations):
                     last_best_fitness = population.get_best_fitness().fitness
                     last_best_iteration = i
                 
-                # # check for stop condition, 1000 iterations without improvement 
-                # if i - last_best_iteration > 1000:
-                #     break
+                # check for stop condition, 8000 iterations without improvement 
+                if i - last_best_iteration > 800:
+                    break
 
             f.write(line)
             f.write('\n')
 
+            best_solutions.append(population.get_best_fitness())
+
             if best_population == None or best_population.get_best_fitness().fitness > population.get_best_fitness().fitness:
                 best_population = population
+
+    # save the best solutions to the json file
+    with open("best_solutions.json", "w") as jfile:
+        json.dump(best_solutions, jfile)
 
     # Print the best fitness found
     print 'final best_population best fitness: ' + str(best_population.get_best_fitness().fitness) + ' with ' + str(len(
@@ -278,6 +287,6 @@ if len(duplicates) > 0:
     print duplicates
 
 #population_evolution(7000)
-population_evolution(10000)
+population_evolution(4000)
 
 # test_multiple_ga_parameters()
