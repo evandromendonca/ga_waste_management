@@ -1,3 +1,5 @@
+import json
+
 deposit = (268440195, 268440181, 0)
 
 class Chromosome:
@@ -62,6 +64,15 @@ class Chromosome:
         for truck in self.trucks_used:
             r = Route(self.path, truck[1], truck[2], truck[0][1])
             self.routes.append(r)
+
+    def _try(self, o): 
+        try: 
+            return o.__dict__ 
+        except: 
+            return str(o) 
+    
+    def toJSON(self): 
+        return json.dumps(self, default=lambda o: self._try(o), sort_keys=True, indent=0, separators=(',',':')).replace('\n', '')
 
 class Route:
     def __init__(self, full_path, init, end, truck_capacity):
