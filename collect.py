@@ -95,16 +95,16 @@ def population_evolution(num_iterations):
             if best_population == None or best_population.get_best_fitness().fitness > population.get_best_fitness().fitness:
                 best_population = population
 
-    # save the best solutions to the json file
-    for s in best_solutions:
-        s.path = list(e[0:3] for e in s.path)
-    with open("best_solutions3.json", "w") as jfile:
-        jfile.write('[')
-        for s in best_solutions:
-            d = s.toJSON()
-            jfile.write(d)
-            jfile.write(',')
-        jfile.write(']')
+    # # save the best solutions to the json file
+    # for s in best_solutions:
+    #     s.path = list(e[0:3] for e in s.path)
+    # with open("best_solutions3.json", "w") as jfile:
+    #     jfile.write('[')
+    #     for s in best_solutions:
+    #         d = s.toJSON()
+    #         jfile.write(d)
+    #         jfile.write(',')
+    #     jfile.write(']')
 
     # Print the best fitness found
     # print 'final best_population best fitness: ' + str(best_population.get_best_fitness().fitness) + ' with ' + str(len(
