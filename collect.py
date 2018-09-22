@@ -61,7 +61,7 @@ def population_evolution(num_iterations):
     with open(file_name, 'w') as f:
         best_population = None
 
-        for i in range(0, 2):
+        for i in range(0, 5):
             # randomize the initial population
             population = Population(helper, G.edges(
                 keys=True, data=True), trucks, True, pop, tour, cross, mut)
@@ -95,22 +95,22 @@ def population_evolution(num_iterations):
             if best_population == None or best_population.get_best_fitness().fitness > population.get_best_fitness().fitness:
                 best_population = population
 
-    # # save the best solutions to the json file
-    # for s in best_solutions:
-    #     s.path = list(e[0:3] for e in s.path)
-    # with open("best_solutions3.json", "w") as jfile:
-    #     jfile.write('[')
-    #     for s in best_solutions:
-    #         d = s.toJSON()
-    #         jfile.write(d)
-    #         jfile.write(',')
-    #     jfile.write(']')
+    # save the best solutions to the json file
+    for s in best_solutions:
+        s.path = list(e[0:3] for e in s.path)
+    with open("best_solutions_with_larger_truck_only.json", "w") as jfile:
+        jfile.write('[')
+        for s in best_solutions:
+            d = s.toJSON()
+            jfile.write(d)
+            jfile.write(',')
+        jfile.write(']')
 
     # Print the best fitness found
-    # print 'final best_population best fitness: ' + str(best_population.get_best_fitness().fitness) + ' with ' + str(len(
-    #     best_population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(best_population.get_best_fitness().path)) + \
-    #     ' - Distance from deposit: ' + str(best_population.get_best_fitness().deposit_distance) + ' - Difference: ' + \
-    #     str(best_population.get_best_fitness().fitness - best_population.get_best_fitness().deposit_distance)
+    print 'final best_population best fitness: ' + str(best_population.get_best_fitness().fitness) + ' with ' + str(len(
+        best_population.get_best_fitness().trucks_used)) + ' trucks and with paths number: ' + str(len(best_population.get_best_fitness().path)) + \
+        ' - Distance from deposit: ' + str(best_population.get_best_fitness().deposit_distance) + ' - Difference: ' + \
+        str(best_population.get_best_fitness().fitness - best_population.get_best_fitness().deposit_distance)
 
     # deposit = filter(lambda x: x[0] == 268440195 and x[1] == 268440181 and x[2] == 0, list(G_lisbon.edges(keys=True, data=True)))[0]
 
@@ -197,9 +197,9 @@ else:
 # 02-TZ-69	9	1170
 # 87-CE-84	7	910
 trucks = [
-    ('31-61-UI', 1456),
-    ('02-TZ-69', 936),
-    ('87-CE-84', 728)
+    ('31-61-UI', 1456)#,
+    #('02-TZ-69', 936),
+    #('87-CE-84', 728)
 ]
 
 try:
