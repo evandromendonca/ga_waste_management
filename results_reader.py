@@ -39,15 +39,25 @@ print 'final best_population best fitness: ' + str(best_fitness['fitness']) + ' 
     ' - Distance from deposit: ' + str(best_fitness['deposit_distance']) + ' - Difference: ' + \
     str(best_fitness['fitness'] - best_fitness['deposit_distance'])
 
-deposit = filter(lambda x: x[0] == 268440195 and x[1] == 268440181 and x[2] == 0, list(G_lisbon.edges(keys=True, data=True)))[0]
+# print the routes rotes with the trucks and the capacity used
+count = 1
+for truck in best_fitness['trucks_used']:
+    print 'Route: ' + str(count)
+    print 'Number of served edges: ' + str(len(best_fitness['path'][truck[1]:truck[2]]))
+    print 'Truck capacity: ' + str(truck[0][1])
+    print 'Truck load: ' + str(truck[3])
+    print 'Percentage load: ' + str(round((truck[3]/truck[0][1]) * 100, 2))
+    count += 1
 
-# Plot the route
-best = Chromosome()
-best.path = best_fitness['path'] 
-best.trucks_used = best_fitness['trucks_used']
-best.generate_routes()
-for route in best.routes:
-    route_path = route.get_route_path()
-    route_path.insert(0, deposit)
-    route_path.append(deposit)
-    show_route(route_path)
+# deposit = filter(lambda x: x[0] == 268440195 and x[1] == 268440181 and x[2] == 0, list(G_lisbon.edges(keys=True, data=True)))[0]
+
+# # Plot the route
+# best = Chromosome()
+# best.path = best_fitness['path'] 
+# best.trucks_used = best_fitness['trucks_used']
+# best.generate_routes()
+# for route in best.routes:
+#     route_path = route.get_route_path()
+#     route_path.insert(0, deposit)
+#     route_path.append(deposit)
+#     show_route(route_path)

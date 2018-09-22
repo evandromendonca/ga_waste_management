@@ -80,7 +80,7 @@ class Route:
         self.initial_index = init
         self.final_index = end
         self.truck_capacity = truck_capacity
-        self.route_length = 20  # the initial length to go to the base and return
+        self.route_length = 0
         self.garbage_weigth = None
 
     def check_route_validity(self):
